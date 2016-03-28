@@ -1,0 +1,23 @@
+\documentclass[twocolumn]{article}
+
+\usepackage{amsmath}
+\usepackage{bm}
+
+\begin{document}
+
+\newcommand{\ealom}{e^{O_{\alpha}}}%{-\alpha\omega(r_1^2+r_2^2)/2}}
+\newcommand{\ebeta}{e^{O_{\beta}}}%{a r_{12}/(1+\beta r_{12})}}
+\newcommand{\PsiT}{\Psi_T({\bm r}_1,{\bm r}_2)}
+\newcommand{\alom}{\alpha\omega}
+
+
+\begin{flalign}
+  \PsiT &= C\ealom\ebeta\\
+  \nabla\PsiT &= -C\alom e^{O_{\alpha}}e^{O_{\beta}}(r_1 + r_2)\\
+  \nabla^2\PsiT &= C\left(\sum_{i=1}^2\alom r_i(\alom r_i - 1)\ealom\ebeta\right)\\
+  \frac{\nabla^2\PsiT}{\PsiT} &= \sum_{i=1}^2\alom r_i(\alom r_i - 1)
+\end{flalign}
+where $r_i = \sqrt{r_{ix}^2 + r_{iy}^2}$, $r_{ij} = |{\bm r}_i - {\bm r}_j|$,\\
+$e^{O_{\alpha}} = -\alpha\omega(r_1^2+r_2^2)/2$,\\
+$e^{O_{\beta}} = a r_{12}/(1+\beta r_{12})$.
+\end{document}

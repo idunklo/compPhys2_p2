@@ -6,6 +6,7 @@
 #include <random>
 #include <cmath>
 #include <string>
+#include "mpi.h"
 #include "Particle.h"
 #include "../Sampler/Sampler.h"
 #include "../Hamiltonian/Hamiltonian.h"
@@ -26,6 +27,9 @@ class System
     void set_nDimensions	          (int nDimensions);
     void set_nParticles	  	        (int nParticles);
     void set_nCycles	  	          (int nCycles);
+    void set_Comm                   (MPI_Comm comm);
+    void set_rank                   (int my_rank);
+    void set_procs                  (int num_procs);
     void set_stepLength		          (double stepLength);
     void set_derivativeStep	        (double h);
     void set_equilibrationFraction  (double equilibractionFraction);
@@ -35,9 +39,12 @@ class System
     void set_Timer		              (class Timer* timer);
     void set_parameters		          (std::vector<double> parameters);
     
+    MPI_Comm get_Comm        (){return my_comm;}
     int	    get_nDimensions		  (){return my_nDimensions;}
     int     get_nParticles	   	(){return my_nParticles;}
     int	    get_nCycles			    (){return my_nCycles;}
+    int     get_rank            (){return my_rank;}
+    int     get_procs           (){return num_procs;}
     double  get_stepLength	    (){return my_stepLength;}
     double  get_derivativeStep	(){return my_derivativeStep;}
     double  get_derivativeStep2	(){return my_derivativeStep2;}
@@ -55,7 +62,10 @@ class System
     
   protected:
     //std::ofstream my_oFile;
+    MPI_Comm my_comm;
     bool    my_File		                = false;
+    int     my_rank                   = 0;
+    int     num_procs                 = 1;
     int     my_nDimensions		        = 0;
     int     my_nParticles		          = 0;
     int     my_nCycles		            = 0;

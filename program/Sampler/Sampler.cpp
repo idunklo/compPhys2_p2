@@ -32,12 +32,12 @@ void Sampler::sample (bool accepted)
     my_oEnergies.write(reinterpret_cast<char *>(&localEnergy),sizeof(double));
     for (int p = 0 ; p < my_system->get_nParticles() ; p++){
       for (int d = 0 ; d < my_system->get_nDimensions() ; d++){
-	my_oPositions << my_system->get_particle()[p]->get_position()[d];
-	if (d+1 < my_system->get_nDimensions())
-	  my_oPositions << ",";
+	      my_oPositions << my_system->get_particle()[p]->get_position()[d];
+	      if (d+1 < my_system->get_nDimensions())
+	        my_oPositions << ",";
       }
       if (p+1 < my_system->get_nParticles())
-	my_oPositions << ";";
+	      my_oPositions << ";";
     }
     my_oPositions << "\n";
   }
@@ -52,26 +52,44 @@ void Sampler::sample (bool accepted)
 
 void Sampler::printResults ()
 {
+
   if (my_oEnergies.is_open())
     my_oEnergies.close();
   if (my_oPositions.is_open())
     my_oPositions.close();
 
-  //else
-  //{
+  //if(my_system->get_rank()==0){
+
+    double totalExpect      = 0;
+    double totalExpect2     = 0;
+    double totalVar	        = 0;
+    double totalAccept      = 0;
+  //}
+  double expectationValue    = cumulativeEnergy/(double)my_stepNumber;
+  double expectationValue2   = cumulativeEnergy2/(double)my_stepNumber;
+  double variance	       = (expectationValue2 - expectationValue * expectationValue);
+  double acceptanceRatio     = cumulativeAcceptanceRate/(double)my_stepNumber;
+
+  MPI_Reduce (&expectationValue, &totalExpect, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  MPI_Reduce (&expectationValue2, &totalExpect2, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  MPI_Reduce (&variance, &totalVar, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  MPI_Reduce (&acceptanceRatio, &totalAccept, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+ 
+  if (my_system->get_rank()==0){
     int	 nParticles	       = my_system->get_nParticles();
     int	 nDimensions	       = my_system->get_nDimensions(); 
-    double nCycles	       = my_system->get_nCycles();
+    int  num_procs        = my_system->get_procs();
+    double nCycles	       = my_system->get_nCycles()*my_system->get_procs();
     double alpha	       = my_system->get_parameters()[0];
     double omega	       = my_system->get_parameters()[1];
     double gamma	       = my_system->get_parameters()[2];
 //    double timeStep	       = my_system->get_timeStep();
     double stepLength	       = my_system->get_stepLength();
     double derivativeStep      = my_system->get_derivativeStep();
-    double expectationValue    = cumulativeEnergy/(double)my_stepNumber;
-    double expectationValue2   = cumulativeEnergy2/(double)my_stepNumber;
-    double variance	       = (expectationValue2 - expectationValue * expectationValue);
-    double acceptanceRatio     = cumulativeAcceptanceRate/(double)my_stepNumber;
+    //double expectationValue    = cumulativeEnergy/(double)my_stepNumber;
+    //double expectationValue2   = cumulativeEnergy2/(double)my_stepNumber;
+    //double variance	       = (expectationValue2 - expectationValue * expectationValue);
+    //double acceptanceRatio     = cumulativeAcceptanceRate/(double)my_stepNumber;
 
     printf("\n");
     printf("\033[1;44m====================  System Data ====================\033[1;m\n");
@@ -86,8 +104,11 @@ void Sampler::printResults ()
 //    printf("\033[0;93mTime step:               %f\033[0;m\n",timeStep);
     printf("\033[0;93mDerivative step:         %f\033[0;m\n",derivativeStep);
     printf("\033[1;105m~~~~~~~~~~~~~~~~~~~~~ Results ~~~~~~~~~~~~~~~~~~~~~~~~\033[1;m\n");
-    printf("\033[0;91mExpectation Value:       %e\033[0;m\n",expectationValue);
-    printf("\033[0;91mVariance:                %e\033[0;m\n",variance);
-    printf("\033[0;91mAcceptance ratio:        %f\033[0;m\n",acceptanceRatio);
-  //}
+    printf("\033[0;91mExpectation Value:       %e\033[0;m\n",totalExpect/num_procs);
+    printf("\033[0;91mVariance:                %e\033[0;m\n",totalVar/num_procs);
+    printf("\033[0;91mAcceptance ratio:        %f\033[0;m\n",totalAccept/num_procs);
+    //printf("\033[0;91mExpectation Value:       %e\033[0;m\n",expectationValue);
+    //printf("\033[0;91mVariance:                %e\033[0;m\n",variance);
+    //printf("\033[0;91mAcceptance ratio:        %f\033[0;m\n",acceptanceRatio);
+  }
 }

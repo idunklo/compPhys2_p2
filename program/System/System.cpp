@@ -142,7 +142,6 @@ void System::runImportanceSampling ()
   //randomMove.reserve    (my_nDimensions);
   //quantumForceOld.reserve (my_nDimensions);
   //oldPosition.reserve   (my_nDimensions);
-
   unsigned  seed;
   bool accepted = false;
   my_sampler  = new Sampler(this,my_File);
@@ -169,6 +168,15 @@ void System::set_nParticles (int nParticles)
 
 void System::set_nCycles (int nCycles)
 { my_nCycles = nCycles; }
+
+void System::set_Comm (MPI_Comm comm)
+{ my_comm = comm; }
+
+void System::set_rank (int rank)
+{ my_rank = rank; }
+
+void System::set_procs (int procs)
+{ num_procs = procs; }
 
 void System::set_stepLength (double stepLength)
 { my_stepLength = stepLength; }
