@@ -1,0 +1,15 @@
+
+X1X1
+alpha**2*x1*(x1 + x2 + y1 + y2)*exp(-alpha*(x1**2 + x2**2 + y1**2 + y2**2)/2)*exp(a*sqrt((x1 - x2)**2 + (y1 - y2)**2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)) - alpha*(-a*beta*(x1 - x2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)**2 + a*(x1 - x2)/((beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)*sqrt((x1 - x2)**2 + (y1 - y2)**2)))*(x1 + x2 + y1 + y2)*exp(-alpha*(x1**2 + x2**2 + y1**2 + y2**2)/2)*exp(a*sqrt((x1 - x2)**2 + (y1 - y2)**2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)) - alpha*exp(-alpha*(x1**2 + x2**2 + y1**2 + y2**2)/2)*exp(a*sqrt((x1 - x2)**2 + (y1 - y2)**2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1))
+
+
+X2X2
+alpha**2*x2*(x1 + x2 + y1 + y2)*exp(-alpha*(x1**2 + x2**2 + y1**2 + y2**2)/2)*exp(a*sqrt((x1 - x2)**2 + (y1 - y2)**2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)) - alpha*(-a*beta*(-x1 + x2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)**2 + a*(-x1 + x2)/((beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)*sqrt((x1 - x2)**2 + (y1 - y2)**2)))*(x1 + x2 + y1 + y2)*exp(-alpha*(x1**2 + x2**2 + y1**2 + y2**2)/2)*exp(a*sqrt((x1 - x2)**2 + (y1 - y2)**2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)) - alpha*exp(-alpha*(x1**2 + x2**2 + y1**2 + y2**2)/2)*exp(a*sqrt((x1 - x2)**2 + (y1 - y2)**2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1))
+
+
+Y1Y1
+alpha**2*y1*(x1 + x2 + y1 + y2)*exp(-alpha*(x1**2 + x2**2 + y1**2 + y2**2)/2)*exp(a*sqrt((x1 - x2)**2 + (y1 - y2)**2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)) - alpha*(-a*beta*(y1 - y2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)**2 + a*(y1 - y2)/((beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)*sqrt((x1 - x2)**2 + (y1 - y2)**2)))*(x1 + x2 + y1 + y2)*exp(-alpha*(x1**2 + x2**2 + y1**2 + y2**2)/2)*exp(a*sqrt((x1 - x2)**2 + (y1 - y2)**2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)) - alpha*exp(-alpha*(x1**2 + x2**2 + y1**2 + y2**2)/2)*exp(a*sqrt((x1 - x2)**2 + (y1 - y2)**2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1))
+
+
+Y2Y2
+alpha**2*y2*(x1 + x2 + y1 + y2)*exp(-alpha*(x1**2 + x2**2 + y1**2 + y2**2)/2)*exp(a*sqrt((x1 - x2)**2 + (y1 - y2)**2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)) - alpha*(-a*beta*(-y1 + y2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)**2 + a*(-y1 + y2)/((beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)*sqrt((x1 - x2)**2 + (y1 - y2)**2)))*(x1 + x2 + y1 + y2)*exp(-alpha*(x1**2 + x2**2 + y1**2 + y2**2)/2)*exp(a*sqrt((x1 - x2)**2 + (y1 - y2)**2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1)) - alpha*exp(-alpha*(x1**2 + x2**2 + y1**2 + y2**2)/2)*exp(a*sqrt((x1 - x2)**2 + (y1 - y2)**2)/(beta*sqrt((x1 - x2)**2 + (y1 - y2)**2) + 1))
