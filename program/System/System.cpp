@@ -20,10 +20,11 @@ bool System::metropolis ()
   std::uniform_int_distribution<int> particle  (0,my_nParticles-1);
   std::uniform_int_distribution<int> dimension (0,my_nDimensions-1);
 
-  randomMove    = my_normal(my_generator)*my_stepLength;//*(my_uniform(my_generator)-0.5);
+  randomMove      = my_stepLength*(my_uniform(my_generator)-0.5);
+
   chosenParticle  = particle(my_generator);
   chosenDimension = dimension(my_generator);
-
+  
   waveFunctionOld = my_waveFunction->evaluate();
 
   my_particles[chosenParticle]->changePosition(chosenDimension, randomMove);
@@ -31,14 +32,11 @@ bool System::metropolis ()
   waveFunctionNew = my_waveFunction->evaluate();
 
   waveFunctionsCompared = (waveFunctionNew*waveFunctionNew)/
-             (waveFunctionOld*waveFunctionOld);
+                          (waveFunctionOld*waveFunctionOld);
 
-
-  if (waveFunctionsCompared < 1.0){
-    if (waveFunctionsCompared < my_uniform(my_generator)){
-      my_particles[chosenParticle]->changePosition(chosenDimension, -randomMove);
-      return false;
-    }
+  if (waveFunctionsCompared < my_uniform(my_generator)){
+    my_particles[chosenParticle]->changePosition(chosenDimension, -randomMove);
+    return false;
   }
   return true;
 }
@@ -115,7 +113,6 @@ void System::runMetropolis ()
 {
   //ProgressBar *bar = new ProgressBar(my_nCycles);
   //bar->SetFrequencyUpdate(9);
-
   unsigned  seed;
   bool accepted = false;
   my_sampler  = new Sampler(this, my_File);

@@ -31,15 +31,16 @@ double TrialWaveFunction::evaluate ()
       argument2 += sep/(1+beta*sep);
     }
   }
-  argument1 *= -0.5*alpha*omega;
+  argument1 = argument1*(-0.5*alpha*omega);
   argument2 *= a;
 
   return exp(argument1 + argument2);
 }
 
-
 double TrialWaveFunction::computeQuantumForce(int p)
 {
+  //This is wrong, must change!
+  /*
   double quantumForce	= 0;
   double alom         = my_system->get_parameters()[0]*
                         my_system->get_parameters()[2];
@@ -49,5 +50,6 @@ double TrialWaveFunction::computeQuantumForce(int p)
   const double r = sqrt(x*x + y*y);
   quantumForce = -r*alom;
   return quantumForce;
+  */
 }
 
