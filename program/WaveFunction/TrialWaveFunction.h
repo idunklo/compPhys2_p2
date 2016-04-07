@@ -6,5 +6,6 @@ class TrialWaveFunction : public WaveFunction
   public:
     TrialWaveFunction		        (class System* system);
     double evaluate		          ();
-    double computeQuantumForce  (int p);
+    double computeGradient      (int p, int d);
+    double computeQuantumForce  (int p, int d);
 };

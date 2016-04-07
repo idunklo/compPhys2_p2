@@ -10,10 +10,10 @@ TrialWaveFunction::TrialWaveFunction (System* system) :
 double TrialWaveFunction::evaluate ()
 {
   int nP            = my_system->get_nParticles();
-  double a          = 1; 
   double alpha      = my_system->get_parameters()[0];
   double beta       = my_system->get_parameters()[1];
   double omega      = my_system->get_parameters()[2];
+  double a          = my_system->get_parameters()[3]; 
 
   double argument1  = 0;
   double argument2  = 0;
@@ -37,7 +37,33 @@ double TrialWaveFunction::evaluate ()
   return exp(argument1 + argument2);
 }
 
-double TrialWaveFunction::computeQuantumForce(int p)
+double TrialWaveFunction::computeGradient(int p, int d)
+{
+  int sign      = (1-2*(p%2==0));
+  double d1     = 0;
+  double d2     = 0;
+  double expression = 0; 
+  double alpha  = my_system->get_parameters()[0];
+  double beta   = my_system->get_parameters()[1];
+  double a      = my_system->get_parameters()[3];
+  double x1     = my_system->get_particle()[0]->get_position()[0];
+  double x2     = my_system->get_particle()[1]->get_position()[0];
+  double y1     = my_system->get_particle()[0]->get_position()[1];
+  double y2     = my_system->get_particle()[1]->get_position()[1];
+  double r12    = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+  if (d==0){
+    d1 = x1;
+    d2 = x2;
+  }
+  else{
+    d1 = y1;
+    d2 = y2;
+  }
+  expression = -alpha*2*d + sign*(a*(d1-d2))/((beta*r12+1)*(beta*r12+1)*r12);
+  return expression;
+}
+
+double TrialWaveFunction::computeQuantumForce(int p, int d)
 {
   //This is wrong, must change!
   /*

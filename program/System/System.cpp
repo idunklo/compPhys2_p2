@@ -75,8 +75,8 @@ bool System::importanceSampling()
       randomMove  = (my_normal(my_generator)) * sqrt(my_stepLength)
                    + quantumForceOld[p] * my_stepLength * 0.5;
       my_particles[p]->changePosition(d,randomMove);
+    quantumForceOld[p] = my_waveFunction->computeQuantumForce(p, d);
     }
-    quantumForceOld[p] = my_waveFunction->computeQuantumForce(p);
   }
 
   waveFunctionNew = my_waveFunction->evaluate();
@@ -85,7 +85,7 @@ bool System::importanceSampling()
     for (int d = 0 ; d < nD ; d++){
       stepDifference  = my_particles[p]->get_position()[d] - oldPositions[p]->get_position()[d];
 
-      quantumForceNew = my_waveFunction->computeQuantumForce(p);
+      quantumForceNew = my_waveFunction->computeQuantumForce(p, d);
 
       greensExp  += (0.5*(quantumForceOld[p] + quantumForceNew)*
                     ((quantumForceOld[p] - quantumForceNew)*

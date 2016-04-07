@@ -43,15 +43,16 @@ int main (int argc,char* argv[]){
 //    cout << "Usage: ./program Ndim Npart (writeToFile)\n";
 //    exit (EXIT_FAILURE);
 //  }
-  int 	  nCycles	        = (int) 1e7;
+  int 	  nCycles	        = (int) 1e6;
   double  omega		        = 1.0;
-  double  alpha		        = 0.5;
+  double  alpha		        = 1.0;
   double  beta		        = 1.0;
-  double  stepLength	    = 5.7;
+  double  a               = 1.0;
+  double  stepLength	    = 4.3;
   double  equilibration	  = 0.1;
   double  derivativeStep  = 0.001;
 
-  std::vector<double> parameters {alpha, beta, omega};
+  std::vector<double> parameters {alpha, beta, omega, a};
 
   int chosenOne = 1;
 

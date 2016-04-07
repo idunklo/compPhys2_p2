@@ -42,3 +42,4 @@ double WaveFunction::computeDerivative(int p, int d, double waveFunctionCurrent)
 
   return derivative;
 }
+
