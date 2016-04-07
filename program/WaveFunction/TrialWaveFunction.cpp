@@ -40,7 +40,7 @@ double TrialWaveFunction::evaluate ()
   }
   argument1 = argument1*(-0.5*alpha*omega);
   argument2 *= a;
-  argument2 = 0;
+
   return exp(argument1 + argument2);
 }
 

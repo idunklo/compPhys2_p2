@@ -44,13 +44,13 @@ int main (int argc,char* argv[]){
 //    exit (EXIT_FAILURE);
 //  }
   int 	  nCycles	        = (int) 1e6;
-  double  omega		        = 1.0;
-  double  alpha		        = 1.0;
-  double  beta		        = 1.0;
+  double  omega		        = 0.5;
+  double  alpha		        = 0.95455;
+  double  beta		        = 0.50905;
   double  a               = 1.0;
   double  stepLength	    = 4.0;
   double  equilibration	  = 0.1;
-  double  derivativeStep  = 0.00001;
+  double  derivativeStep  = 0.001;
 
   std::vector<double> parameters {alpha, beta, omega, a};
 

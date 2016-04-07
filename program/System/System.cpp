@@ -21,7 +21,7 @@ bool System::metropolis ()
   std::uniform_int_distribution<int> dimension (0,my_nDimensions-1);
 
   randomMove      = my_stepLength*(my_uniform(my_generator)-0.5);
-
+       
   chosenParticle  = particle(my_generator);
   chosenDimension = dimension(my_generator);
   
