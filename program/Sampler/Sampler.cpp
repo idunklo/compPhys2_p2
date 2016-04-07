@@ -82,8 +82,9 @@ void Sampler::printResults ()
     int  num_procs          = my_system->get_procs();
     double nCycles	        = my_system->get_nCycles()*my_system->get_procs();
     double alpha	          = my_system->get_parameters()[0];
-    double omega	          = my_system->get_parameters()[1];
-    double gamma	          = my_system->get_parameters()[2];
+    double beta             = my_system->get_parameters()[1];
+    double omega	          = my_system->get_parameters()[2];
+    double a                = my_system->get_parameters()[3];
 //    double timeStep	       = my_system->get_timeStep();
     double stepLength	      = my_system->get_stepLength();
     double derivativeStep    = my_system->get_derivativeStep();
@@ -91,7 +92,8 @@ void Sampler::printResults ()
     //double expectationValue2   = cumulativeEnergy2/(double)my_stepNumber;
     //double variance	       = (expectationValue2 - expectationValue * expectationValue);
     //double acceptanceRatio     = cumulativeAcceptanceRate/(double)my_stepNumber;
-
+    cout << "taut: ";
+    cout << (totalExpect - 3.0/4.0)/2.0 << endl;
     printf("\n");
     printf("\033[1;44m====================  System Data ====================\033[1;m\n");
     printf("\033[0;93mNumber of particles:     %i\033[0;m\n",nParticles);
@@ -99,7 +101,8 @@ void Sampler::printResults ()
     printf("\033[0;93mNumber of cycles:        %0.1e\033[0;m\n",nCycles);
     printf("\033[0;93mAlpha:                   %f\033[0;m\n",alpha);
     printf("\033[0;93mOmega:                   %f\033[0;m\n",omega);
-    printf("\033[0;93mGamma:                   %f\033[0;m\n",gamma);
+    printf("\033[0;93mBeta:                    %f\033[0;m\n",beta);
+    printf("\033[0;93ma:                       %f\033[0;m\n",a);
     printf("\033[0;93mStep length:             %f\033[0;m\n",stepLength);
     printf("\033[0;93mNumber of steps          %i\033[0;m\n",my_stepNumber);
 //    printf("\033[0;93mTime step:               %f\033[0;m\n",timeStep);

@@ -24,7 +24,7 @@ int main (int argc,char* argv[]){
   MPI_Comm_size (MPI_COMM_WORLD,&num_procs);
 
   bool File        = false;
-  int  nDimensions = 2;
+  int  nDimensions = 3;
   int  nParticles  = 2;
 //  if (argc == 4)
 //  {
@@ -48,9 +48,9 @@ int main (int argc,char* argv[]){
   double  alpha		        = 1.0;
   double  beta		        = 1.0;
   double  a               = 1.0;
-  double  stepLength	    = 4.3;
+  double  stepLength	    = 4.0;
   double  equilibration	  = 0.1;
-  double  derivativeStep  = 0.001;
+  double  derivativeStep  = 0.00001;
 
   std::vector<double> parameters {alpha, beta, omega, a};
 

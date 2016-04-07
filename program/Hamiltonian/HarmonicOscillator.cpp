@@ -11,6 +11,7 @@ double HarmonicOscillator::computeLocalEnergy ()
   double  Hrep          = 0;
   double  ddPsi         = 0;
   double  waveFuncNow   = 0;
+  double  rep           = 0;
   double  omega         = my_system->get_parameters()[2];
   double  omega2        = omega*omega;
   int     nP            = my_system->get_nParticles();
@@ -19,24 +20,25 @@ double HarmonicOscillator::computeLocalEnergy ()
   waveFuncNow = my_system->get_waveFunction()->evaluate();
 
   for (int p1 = 0 ; p1 < nP ; p1++){
-    ddPsi += my_system->get_waveFunction()->
-      computeDoubleDerivative(p1,0,waveFuncNow);
-    ddPsi += my_system->get_waveFunction()->
-      computeDoubleDerivative(p1,1,waveFuncNow);
-    const double x = my_system->get_particle()[p1]->get_position()[0];
-    const double y = my_system->get_particle()[p1]->get_position()[1];
-    const double r2 = x*x + y*y; 
-
-    HOext += r2;
+    for (int d = 0 ; d < nD ; d++){
+      ddPsi += my_system->get_waveFunction()->
+               computeDoubleDerivative(p1,d,waveFuncNow);
+      const double x = my_system->get_particle()[p1]->get_position()[d];
+      HOext += x*x;
+    }
     
     for (int p2 = p1 + 1 ; p2 < nP ; p2++){
-      const double deltaX = x - my_system->get_particle()[p2]->get_position()[0];
-      const double deltaY = y - my_system->get_particle()[p2]->get_position()[1];
-      Hrep += 1/sqrt(deltaX*deltaX + deltaY*deltaY);
+      rep = 0;
+      for (int d = 0 ; d < nD ; d++){
+        const double deltaX = my_system->get_particle()[p1]->get_position()[d]- 
+                              my_system->get_particle()[p2]->get_position()[d];
+        rep += deltaX*deltaX;
+      }
+      Hrep += 1/sqrt(rep);
     }
   }
   HOLap = -0.5*ddPsi/waveFuncNow;
   HOext = 0.5*HOext*omega2;
-  
+  Hrep = 0; 
   return HOLap + HOext + Hrep;
 }

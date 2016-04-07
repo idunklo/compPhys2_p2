@@ -10,6 +10,7 @@ TrialWaveFunction::TrialWaveFunction (System* system) :
 double TrialWaveFunction::evaluate ()
 {
   int nP            = my_system->get_nParticles();
+  int nD            = my_system->get_nDimensions();
   double alpha      = my_system->get_parameters()[0];
   double beta       = my_system->get_parameters()[1];
   double omega      = my_system->get_parameters()[2];
@@ -17,23 +18,29 @@ double TrialWaveFunction::evaluate ()
 
   double argument1  = 0;
   double argument2  = 0;
+  double sep        = 0;
 
 
   for (int p1 = 0 ; p1 < nP ; p1++){
-    const double x = my_system->get_particle()[p1]->get_position()[0];
-    const double y = my_system->get_particle()[p1]->get_position()[1];
-    argument1 += x*x + y*y;
+    for (int d = 0 ; d < nD ; d++){
+      const double x = my_system->get_particle()[p1]->get_position()[d];
+      argument1 += x*x;
+    }
 
     for (int p2 = p1+1 ; p2 < nP ; p2++){
-      const double deltaX = x - my_system->get_particle()[p2]->get_position()[0];
-      const double deltaY = y - my_system->get_particle()[p2]->get_position()[1];
-      const double sep    = sqrt(deltaX*deltaX + deltaY*deltaY);
+      sep = 0;
+      for (int d = 0 ; d < nD ; d++){
+        const double deltaX = my_system->get_particle()[p1]->get_position()[d]- 
+                              my_system->get_particle()[p2]->get_position()[d];
+        sep += deltaX*deltaX;
+      }
+      sep = sqrt(sep);
       argument2 += sep/(1+beta*sep);
     }
   }
   argument1 = argument1*(-0.5*alpha*omega);
   argument2 *= a;
-
+  argument2 = 0;
   return exp(argument1 + argument2);
 }
 
