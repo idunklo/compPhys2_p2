@@ -10,12 +10,12 @@ System::System (bool File)
 
 bool System::metropolis ()
 {
-  int     chosenParticle    = 0;
-  int     chosenDimension   = 0;
-  double  waveFunctionOld   = 0;
-  double  waveFunctionNew   = 0;
+  int     chosenParticle        = 0;
+  int     chosenDimension       = 0;
+  double  waveFunctionOld       = 0;
+  double  waveFunctionNew       = 0;
   double  waveFunctionsCompared = 0;
-  double  randomMove      = 0;
+  double  randomMove            = 0;
 
   std::uniform_int_distribution<int> particle  (0,my_nParticles-1);
   std::uniform_int_distribution<int> dimension (0,my_nDimensions-1);

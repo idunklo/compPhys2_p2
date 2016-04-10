@@ -48,7 +48,7 @@ int main (int argc,char* argv[]){
   double  alpha		        = 0.95455;
   double  beta		        = 0.50905;
   double  a               = 1.0;
-  double  stepLength	    = 4.0;
+  double  stepLength	    = 5.7;
   double  equilibration	  = 0.1;
   double  derivativeStep  = 0.001;
 

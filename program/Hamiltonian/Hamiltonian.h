@@ -7,7 +7,8 @@ class Hamiltonian
 
     Hamiltonian (class System* system);
 
-    virtual double computeLocalEnergy () = 0;
+    virtual double computeNumLocalEnergy () = 0;
+    virtual double computeAnaLocalEnergy () = 0;
 
   protected:
     

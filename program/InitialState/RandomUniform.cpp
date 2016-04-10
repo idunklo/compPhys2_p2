@@ -28,9 +28,7 @@ void RandomUniform::setupInitialState ()
   generator.seed(seed);
 
   std::vector<double> position(my_nDimensions);
-
   for (int i = 0 ; i < my_nParticles ; i++){
-    
     for(int j = 0 ; j < my_nDimensions ; j++){
       position[j] = (uniform(generator) - 0.5);
     }
@@ -38,4 +36,15 @@ void RandomUniform::setupInitialState ()
     my_system->get_particle().at(i)->set_nDimensions    (my_nDimensions);
     my_system->get_particle().at(i)->set_position       (position);
   }
+  //Static
+  /*
+  my_system->add_particle(new Particle());
+  my_system->get_particle().at(0)->set_nDimensions    (my_nDimensions);
+  position = {0.015,0.015,0.015};
+  my_system->get_particle().at(0)->set_position       (position);
+  my_system->add_particle(new Particle());
+  my_system->get_particle().at(1)->set_nDimensions    (my_nDimensions);
+  position = {-0.025,-0.025,-0.025};
+  my_system->get_particle().at(1)->set_position       (position);
+  */
 }

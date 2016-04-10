@@ -20,12 +20,13 @@ void Sampler::sample (bool accepted)
 {
   if (my_stepNumber == 0)
   {
-    cumulativeEnergy	      = 0;
-    cumulativeEnergy2	      = 0;
+    cumulativeEnergy	        = 0;
+    cumulativeEnergy2	        = 0;
     cumulativeAcceptanceRate  = 0;
   }
 
-  double localEnergy = my_system->get_hamiltonian()->computeLocalEnergy();
+  //double localEnergy = my_system->get_hamiltonian()->computeNumLocalEnergy();
+  double localEnergy = my_system->get_hamiltonian()->computeAnaLocalEnergy();
 
   if (my_oEnergies.is_open())
   {
