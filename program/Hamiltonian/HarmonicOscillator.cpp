@@ -56,13 +56,12 @@ double HarmonicOscillator::computeAnaLocalEnergy()
   double       HOExt    = 0;
   double       Hrep     = 0;
   double       parent2  = 0;
-  double       r2      = 0;
-  //double       sep      = 0;
+  double       r2       = 0;
   double       sep2     = 0;
   double       term1    = 0;
   double       term2    = 0;
   double       term3    = 0;
-  double       term4    = 0;
+  //double       term4    = 0;
 
   
   for (int d = 0 ; d < nD ; d++){

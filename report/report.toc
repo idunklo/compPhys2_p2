@@ -1,0 +1,5 @@
+\contentsline {section}{\numberline {1}4234}{1}
+\contentsline {subsection}{\numberline {.1}Calculations}{1}
+\contentsline {subsubsection}{\numberline {.1.1}Local Energy $E_L$}{1}
+\contentsline {paragraph}{Derivative of first exponential}{1}
+\contentsline {paragraph}{Derivative of second exponential}{1}
