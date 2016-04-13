@@ -88,7 +88,7 @@ class System
     clock::time_point my_start = clock::now();
     std::uniform_real_distribution<double> my_uniform {std::uniform_real_distribution<double>(0.0,1.0)};
     std::normal_distribution<double> my_normal {std::normal_distribution<double>(0,1.0/sqrt(2))};
-    std::default_random_engine my_generator;
+    std::mt19937 my_generator;
 };
 
 

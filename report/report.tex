@@ -1,23 +1,39 @@
-\documentclass[twocolumn]{article}
+\documentclass[]{article}
 
 \usepackage{amsmath}
 \usepackage{bm}
+\usepackage[margin=1cm]{geometry}
+\usepackage{multicol}
 
 \begin{document}
 
+\newcommand{\ea}{e^{-\alpha\omega(r_1^2 + r_2^2)/2}}
+\newcommand{\eb}{e^{a r_{12}/(1+\beta r_{12})}}
 \newcommand{\ealom}{e^{O_{\alpha}}}%{-\alpha\omega(r_1^2+r_2^2)/2}}
 \newcommand{\ebeta}{e^{O_{\beta}}}%{a r_{12}/(1+\beta r_{12})}}
 \newcommand{\PsiT}{\Psi_T({\bm r}_1,{\bm r}_2)}
 \newcommand{\alom}{\alpha\omega}
 
-
-\begin{flalign}
-  \PsiT &= C\ealom\ebeta\\
-  \nabla\PsiT &= -C\alom e^{O_{\alpha}}e^{O_{\beta}}(r_1 + r_2)\\
-  \nabla^2\PsiT &= C\left(\sum_{i=1}^2\alom r_i(\alom r_i - 1)\ealom\ebeta\right)\\
-  \frac{\nabla^2\PsiT}{\PsiT} &= \sum_{i=1}^2\alom r_i(\alom r_i - 1)
-\end{flalign}
-where $r_i = \sqrt{r_{ix}^2 + r_{iy}^2}$, $r_{ij} = |{\bm r}_i - {\bm r}_j|$,\\
-$e^{O_{\alpha}} = -\alpha\omega(r_1^2+r_2^2)/2$,\\
-$e^{O_{\beta}} = a r_{12}/(1+\beta r_{12})$.
+\begin{multicols}{2}
+Using the trial wavefunction 
+\[\PsiT = e^{-\alpha\omega(r_1^2+r_2^2)/2}e^{a r_{12}/(1+\beta r_{12})}\]
+where $r_i = \sqrt{r_{ix}^2 + r_{iy}^2}$, $r_{ij} = |{\bm r}_i - {\bm r}_j|$
+, redefining the exponentials as 
+\[e^{-\alpha\omega(r_1^2+r_2^2)/2} = \ealom,\quad e^{a r_{12}/(1+\beta r_{12})} = \ebeta\]
+\begin{flalign*}
+  \nabla_{i_x}\Psi_T =%
+  \ealom\ebeta \left( -\alom x_i + (-1)^{i+1}(x_1 - x_2)\frac{a}{r_{12}(1+\beta r_{12})^2}\right)
+\end{flalign*}
+where $i$ and $j$ are particle number.
+This will look the same for the $y$-coordinate and one sign change for 
+the second term depending on the particle number.
+Defining the parenthesis as $[\cdot\cdot]$, taking the Laplacian and dividing
+with $\Psi_T$ to get the local energy $E_L$.
+\begin{flalign*}
+  \frac{\nabla^2_{i_x}\Psi_T}{\Psi_T} = [\cdot\cdot]^2 -\alom + \frac{a}{r^2_{12}(1+\beta r_{12})^2}%
+  \left(r_{12} - \frac{(x_1-x_2)(1-\beta r_{12})}{r_{12}(1+\beta r_{12})}\right)
+\end{flalign*}
+\end{multicols}
+\appendix
+\input{appendix.tex}
 \end{document}

@@ -122,7 +122,9 @@ void System::runMetropolis ()
 
   for (int cycle = 0 ; cycle < my_nCycles ; cycle++){
     accepted = metropolis();
-    //bar->Progressed(cycle);
+  //  if(my_rank==0){
+  //    bar->Progressed(cycle);
+  //  }
     if (cycle > my_equilibrationFraction * my_nCycles)
     {
       my_sampler->sample(accepted);

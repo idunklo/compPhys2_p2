@@ -76,7 +76,7 @@ void Sampler::printResults ()
   MPI_Reduce (&expectationValue2, &totalExpect2, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
   MPI_Reduce (&variance, &totalVar, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
   MPI_Reduce (&acceptanceRatio, &totalAccept, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
- 
+    
   if (my_system->get_rank()==0){
     int	 nParticles	        = my_system->get_nParticles();
     int	 nDimensions	      = my_system->get_nDimensions(); 
@@ -93,8 +93,7 @@ void Sampler::printResults ()
     //double expectationValue2   = cumulativeEnergy2/(double)my_stepNumber;
     //double variance	       = (expectationValue2 - expectationValue * expectationValue);
     //double acceptanceRatio     = cumulativeAcceptanceRate/(double)my_stepNumber;
-    cout << "taut: ";
-    cout << (totalExpect - 3.0/4.0)/2.0 << endl;
+    cout << "taut: " << (totalExpect/num_procs - 3.0/4.0)/2.0 << endl;
     printf("\n");
     printf("\033[1;44m====================  System Data ====================\033[1;m\n");
     printf("\033[0;93mNumber of particles:     %i\033[0;m\n",nParticles);

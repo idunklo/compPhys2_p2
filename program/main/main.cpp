@@ -23,26 +23,9 @@ int main (int argc,char* argv[]){
   MPI_Comm_rank (MPI_COMM_WORLD,&my_rank);
   MPI_Comm_size (MPI_COMM_WORLD,&num_procs);
 
-  bool File        = false;
-  int  nDimensions = 3;
-  int  nParticles  = 2;
-//  if (argc == 4)
-//  {
-//    File	= atoi(argv[4]);
-//    nDimensions = atoi(argv[1]);
-//    nParticles  = atoi(argv[2]);
-//  }
-//  else if (argc == 3)
-//  {
-//    File	      = false;
-//    nDimensions = atoi(argv[1]);
-//    nParticles  = atoi(argv[2]);
-//  }
-//  else 
-//  {
-//    cout << "Usage: ./program Ndim Npart (writeToFile)\n";
-//    exit (EXIT_FAILURE);
-//  }
+  bool    File            = false;
+  int     nDimensions     = 3;
+  int     nParticles      = 2;
   int 	  nCycles	        = (int) 1e6;
   double  omega		        = 0.5;
   double  alpha		        = 0.95455;
@@ -69,7 +52,7 @@ int main (int argc,char* argv[]){
           my_rank, num_procs,
           stepLength,equilibration,derivativeStep,
           parameters);
-
+      break;
   }
 
   MPI_Finalize();

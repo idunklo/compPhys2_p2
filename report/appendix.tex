@@ -1,0 +1,54 @@
+\subsection{Calculations}
+\subsubsection{Local Energy $E_L$}
+\paragraph{Derivative of first exponential}
+\begin{flalign*}
+  &\frac{\partial}{\partial x_1}\ea = -\alom x_1\ea\\ 
+  &\frac{\partial}{\partial x_2}\ea = -\alom x_2\ea
+\end{flalign*}
+
+\paragraph{Derivative of second exponential}
+\begin{flalign*}
+  &\frac{\partial}{\partial x_1}\eb \Rightarrow \\
+  &\text{with change of variables}\\
+  &\frac{\partial r_{12}}{\partial x_1} = \frac{x_1-x_2}{r_{12}},\quad
+  \frac{\partial r_{12}}{\partial x_2} = -\frac{x_1-x_2}{r_{12}}\\
+  &\frac{\partial r_{12}}{\partial x_1}\frac{\partial}{\partial r_{12}}\eb =%
+  \eb\frac{(x_1 - x_2)a}{r_{12}(1+\beta r_{12})^2}\\
+  &\frac{\partial r_{12}}{\partial x_2} \eb =%
+  -\eb\frac{(x_1 - x_2)a}{r_{12}(1+\beta r_{12})^2}
+\end{flalign*}
+
+The result will be the same for other dimensions too.
+Collected the term is
+\[
+  \ea\eb\left(-\alom x_1 + (-1)^{i+1}\frac{a(x_1 - x_2)}{r_{12}(1+\beta r_{12})^2}\right)
+\]
+Defining the parenthesis as $[\cdot\cdot]$ 
+\begin{flalign*}
+  &\frac{\partial}{\partial x_1} [\cdot\cdot] = %
+    a\left(\frac{1}{r_{12}(1+\beta r_{12})^2} - %
+    \frac{(x_1 - x_2)^2}{r_{12}^3(1+\beta r_{12})^2} - %
+    \frac{2(x_1 - x_2)^2}{r_{12}^2(1+\beta r_{12})^3}%
+    \right)\\
+    &= \frac{a}{r_{12}^2(1+\beta r_{12})^2}%
+    \left( r_{12} - (x_1-x_2)^2\left(\frac{1}{r_{12}} -%
+    \frac{2\beta}{r_{12}(1+\beta r_{12})}\right)\right)\\
+    &= \frac{a}{r_{12}^2(1+\beta r_{12})^2}
+    \left( r_{12} - (x_1-x_2)^2\left(\frac{1-\beta r_{12}}{r_{12}(1+\beta r_{12})}%
+    \right)\right)\\
+\end{flalign*}                             
+
+Comibining these calculations gives the gradient and local energy $E_L$
+\begin{equation}
+  \frac{\nabla_{i_x}\Psi_T}{\Psi_T} =%
+  -\alom x_1 + (-1)^{i+1}\frac{a(x_1 - x_2)}{r_{12}(1+\beta r_{12})^2}
+\end{equation}
+\begin{equation}
+  \frac{\nabla^2_{i_x}\Psi_T}{\Psi_T} =%
+  [\cdot\cdot]^2 -\alom +%
+  \frac{a}{r_{12}^2(1+\beta r_{12})^2}%
+  \left( r_{12} - (x_1-x_2)^2\left(\frac{1-\beta r_{12}}{r_{12}(1+\beta r_{12})}%
+  \right)\right)
+\end{equation}
+
+
