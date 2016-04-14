@@ -73,15 +73,15 @@ void Sampler::printResults ()
   double acceptanceRatio    = cumulativeAcceptanceRate/(double)my_stepNumber;
 
   MPI_Reduce (&expectationValue, &totalExpect, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-  MPI_Reduce (&expectationValue2, &totalExpect2, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-  MPI_Reduce (&variance, &totalVar, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-  MPI_Reduce (&acceptanceRatio, &totalAccept, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  //MPI_Reduce (&expectationValue2, &totalExpect2, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  //MPI_Reduce (&variance, &totalVar, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  //MPI_Reduce (&acceptanceRatio, &totalAccept, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     
   if (my_system->get_rank()==0){
     int	 nParticles	        = my_system->get_nParticles();
     int	 nDimensions	      = my_system->get_nDimensions(); 
     int  num_procs          = my_system->get_procs();
-    double nCycles	        = my_system->get_nCycles()*my_system->get_procs();
+    double nCycles	        = my_system->get_nCycles();
     double alpha	          = my_system->get_parameters()[0];
     double beta             = my_system->get_parameters()[1];
     double omega	          = my_system->get_parameters()[2];
@@ -90,12 +90,13 @@ void Sampler::printResults ()
     double stepLength	      = my_system->get_stepLength();
     double derivativeStep    = my_system->get_derivativeStep();
     //double expectationValue    = cumulativeEnergy/(double)my_stepNumber;
-    //double expectationValue2   = cumulativeEnergy2/(double)my_stepNumber;
-    //double variance	       = (expectationValue2 - expectationValue * expectationValue);
-    //double acceptanceRatio     = cumulativeAcceptanceRate/(double)my_stepNumber;
+    double expectationValue2   = cumulativeEnergy2/(double)my_stepNumber;
+    double variance	       = (expectationValue2 - expectationValue * expectationValue);
+    double acceptanceRatio     = cumulativeAcceptanceRate/(double)my_stepNumber;
     cout << "taut: " << (totalExpect/num_procs - 3.0/4.0)/2.0 << endl;
     printf("\n");
     printf("\033[1;44m====================  System Data ====================\033[1;m\n");
+    printf("\033[0;93mNumber of processes:     %i\033[0;m\n",num_procs);
     printf("\033[0;93mNumber of particles:     %i\033[0;m\n",nParticles);
     printf("\033[0;93mNumber of dimensions:    %i\033[0;m\n",nDimensions);
     printf("\033[0;93mNumber of cycles:        %0.1e\033[0;m\n",nCycles);
@@ -109,8 +110,8 @@ void Sampler::printResults ()
     printf("\033[0;93mDerivative step:         %f\033[0;m\n",derivativeStep);
     printf("\033[1;105m~~~~~~~~~~~~~~~~~~~~~ Results ~~~~~~~~~~~~~~~~~~~~~~~~\033[1;m\n");
     printf("\033[0;91mExpectation Value:       %e\033[0;m\n",totalExpect/num_procs);
-    printf("\033[0;91mVariance:                %e\033[0;m\n",totalVar/num_procs);
-    printf("\033[0;91mAcceptance ratio:        %f\033[0;m\n",totalAccept/num_procs);
+    printf("\033[0;91mVariance:                %e\033[0;m\n",variance/nCycles);
+    printf("\033[0;91mAcceptance ratio:        %f\033[0;m\n",acceptanceRatio);
     //printf("\033[0;91mExpectation Value:       %e\033[0;m\n",expectationValue);
     //printf("\033[0;91mVariance:                %e\033[0;m\n",variance);
     //printf("\033[0;91mAcceptance ratio:        %f\033[0;m\n",acceptanceRatio);

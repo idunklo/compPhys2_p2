@@ -27,7 +27,7 @@ class System
     void set_nDimensions	          (int nDimensions);
     void set_nParticles	  	        (int nParticles);
     void set_nCycles	  	          (int nCycles);
-    void set_Comm                   (MPI_Comm comm);
+    //void set_Comm                   (MPI_Comm comm);
     void set_rank                   (int my_rank);
     void set_procs                  (int num_procs);
     void set_stepLength		          (double stepLength);
@@ -39,7 +39,7 @@ class System
     void set_Timer		              (class Timer* timer);
     void set_parameters		          (std::vector<double> parameters);
     
-    MPI_Comm get_Comm        (){return my_comm;}
+    //MPI_Comm get_Comm        (){return my_comm;}
     int	    get_nDimensions		  (){return my_nDimensions;}
     int     get_nParticles	   	(){return my_nParticles;}
     int	    get_nCycles			    (){return my_nCycles;}
@@ -62,7 +62,7 @@ class System
     
   protected:
     //std::ofstream my_oFile;
-    MPI_Comm my_comm;
+    //MPI_Comm my_comm;
     bool    my_File		                = false;
     int     my_rank                   = 0;
     int     num_procs                 = 1;

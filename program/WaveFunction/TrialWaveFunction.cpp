@@ -46,38 +46,30 @@ double TrialWaveFunction::evaluate ()
 
 double TrialWaveFunction::computeGradient(int p, int d)
 {
-  int          sign   = (2*(p==0)-1);
-  double       sep2   = 0;
-  double       x      = 0;
+  int    sign     = (2*(p==0)-1);
+  double xi       = 0;
+  double sep      = 0; 
+  double tot_sep2 = 0;
   const double alpha  = my_system->get_parameters()[0];
   const double beta   = my_system->get_parameters()[1];
   const double omega  = my_system->get_parameters()[2];
   const double a      = my_system->get_parameters()[3];
-  const double xi     = my_system->get_particle()[p]->get_position()[d];
   for (int di = 0 ; di < my_system->get_nDimensions() ; di++){
     const double x1  = my_system->get_particle()[0]->get_position()[di];
     const double x2  = my_system->get_particle()[1]->get_position()[di];
-    x    += x1;
-    sep  += (x1-x2);
+    if (di == d){
+      xi  = (p==0)*x1 + (p==1)*x2;
+      sep = x1-x2;
+    }
+    tot_sep2 += (x1-x2)*(x1-x2);
   }
-  const double r12 = sep*sep;
-  gradient = -alpha*omega*xi + sign*a*sep/(r12*(1+beta*r12)*(1+beta*r12));
+  const double r12 = sqrt(tot_sep2);
+  const double gradient = -alpha*omega*xi + sign*a*sep/(r12*(1+beta*r12)*(1+beta*r12));
   return gradient;
 }
 
 double TrialWaveFunction::computeQuantumForce(int p, int d)
 {
-  //This is wrong, must change!
-  /*
-  double quantumForce	= 0;
-  double alom         = my_system->get_parameters()[0]*
-                        my_system->get_parameters()[2];
-
-  const double x = my_system->get_particle()[p]->get_position()[0]; 
-  const double y = my_system->get_particle()[p]->get_position()[1];
-  const double r = sqrt(x*x + y*y);
-  quantumForce = -r*alom;
-  return quantumForce;
-  */
+  return 2*computeGradient(p,d);
 }
 

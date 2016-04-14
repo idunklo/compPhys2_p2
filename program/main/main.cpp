@@ -28,8 +28,8 @@ int main (int argc,char* argv[]){
   int     nParticles      = 2;
   int 	  nCycles	        = (int) 1e6;
   double  omega		        = 0.5;
-  double  alpha		        = 0.95455;
-  double  beta		        = 0.50905;
+  double  alpha		        = 0.6255;//0.95455;
+  double  beta		        = 0.65008;
   double  a               = 1.0;
   double  stepLength	    = 5.7;
   double  equilibration	  = 0.1;
@@ -77,7 +77,7 @@ void importanceSampling(bool File,
   if (my_rank>0)
     File=false;
 
-  nCycles = (double) nCycles/num_procs;
+  nCycles = (double) nCycles;
   System* system = new System(File);
 
   system->set_parameters		        (parameters);
