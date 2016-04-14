@@ -53,31 +53,59 @@ double HarmonicOscillator::computeAnaLocalEnergy()
   const double a        = my_system->get_parameters()[3];
   const double alom     = alpha*omega;
   double       HOLap    = 0;
+  double       lappis	= 0;
   double       HOExt    = 0;
   double       Hrep     = 0;
   double       parent2  = 0;
   double       r2       = 0;
   double       sep2     = 0;
+  double       sep	= 0;
   double       term1    = 0;
   double       term2    = 0;
   double       term3    = 0;
+  double       x1sep	= 0;
+  double       x2sep	= 0;
   //double       term4    = 0;
 
-  
+  /*
   for (int d = 0 ; d < nD ; d++){
     const double x1   = my_system->get_particle()[0]->get_position()[d];
     const double x2   = my_system->get_particle()[1]->get_position()[d];
     r2   += x1*x1+x2*x2;
-    sep2 += (x1-x2)*(x1-x2);
+    sep  += x1-x2;
+    sep2 += sep*sep;
+    x1sep += sep*x1;
+    x2sep += sep*x2;
   }
 
-  
   const double r12            = sqrt(sep2);
   const double opbr12         = 1 + beta*r12;
   const double opbr122        = opbr12*opbr12;
   const double a_r12opbr122   = a/(r12*opbr122);
   const double lastTermCoeff  = (1-beta*r12)/(opbr12);
-  
+
+
+  lappis = alom*alom*r2 -
+	   2*nD*alom -
+	   2*alom*a/opbr122*r12+//(x1sep-x2sep) +
+	   2*(a/opbr122)*(a_r12opbr122 + 1/r12 - 2*beta/opbr12);
+  */
+  double r1 = 0;
+  double r2 = 0;
+  double r12= 0;
+
+  for (int d = 0 ; d<nD ; d++){
+    const double x1     = my_system->get_particle()[0]->get_position()[d];
+    const double x2     = my_system->get_particle()[1]->get_position()[d];
+    r1 += x1*x1;
+    r2 += x2*x2;
+    r12 += (x1-x2)*(x1-x2) ;
+  }
+    
+  double A = 4*alpha*omega;
+  double B = (4*a*beta)/(
+    
+  /* 
   for (int p = 0 ; p < nP ; p++){
     //double seperation = 0;
     for (int d = 0 ; d < nD ; d++){
@@ -97,9 +125,9 @@ double HarmonicOscillator::computeAnaLocalEnergy()
   term2 = -nP*nD*alom;
   term3 = nP*nD*a_r12opbr122*(1-lastTermCoeff);
   //term4 = -nP*nD*a_r12opbr122*lastTermCoeff;
-
-  HOLap = -0.5*(term1+term2+term3);//+term4);
+ */
+  HOLap = -0.5*lappis;//(term1+term2+term3);//+term4);
   HOExt = 0.5*omega*omega*r2;
-  Hrep  = 1/sqrt(sep2);
+  Hrep  = 1/r12;
   return (HOLap + HOExt + Hrep);
 }

@@ -24,12 +24,12 @@ int main (int argc,char* argv[]){
   MPI_Comm_size (MPI_COMM_WORLD,&num_procs);
 
   bool    File            = false;
-  int     nDimensions     = 3;
+  int     nDimensions     = 2;
   int     nParticles      = 2;
   int 	  nCycles	        = (int) 1e6;
   double  omega		        = 0.5;
-  double  alpha		        = 0.6255;//0.95455;
-  double  beta		        = 0.65008;
+  double  alpha		        = 0.95455;
+  double  beta		        = 0.50905;
   double  a               = 1.0;
   double  stepLength	    = 5.7;
   double  equilibration	  = 0.1;
