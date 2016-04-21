@@ -31,7 +31,6 @@ int main (int argc,char* argv[]){
   double  alpha		        = 0.95455;
   double  beta		        = 0.50905;
   double  a               = 1.0;
-  double  stepLength	    = 5.7;
   double  equilibration	  = 0.1;
   double  derivativeStep  = 0.001;
 
@@ -39,15 +38,18 @@ int main (int argc,char* argv[]){
 
   int chosenOne = 1;
 
+  double  stepLength = 1.0;
   switch (chosenOne)
   {
     case 0:
+      stepLength = 0.01;
       importanceSampling(File,nCycles,nParticles,nDimensions,
           my_rank, num_procs,
           stepLength,equilibration,derivativeStep,
           parameters);
       break;
     case 1:
+      stepLength = 5.7;
       metropolis(File,nCycles,nParticles,nDimensions,
           my_rank, num_procs,
           stepLength,equilibration,derivativeStep,
@@ -71,8 +73,6 @@ void importanceSampling(bool File,
 			double derivativeStep,
 			std::vector<double>parameters)
 {
-// Importance Sampling 
-  //cout << "Initializing Importance Sampling system...\n";
   
   if (my_rank>0)
     File=false;
@@ -122,7 +122,6 @@ void metropolis(bool File,
 {
 // Brute forece Metropolis 
 
-  //nCycles = (double) nCycles/num_procs;
   System* system = new System(File);
    
   system->set_parameters		        (parameters);
@@ -132,11 +131,12 @@ void metropolis(bool File,
   system->set_nCycles               (nCycles);
   system->set_rank                  (my_rank);
   system->set_procs                 (num_procs);
-  //system->set_analytical		        (analytical);
+
 
   system->set_InitialState	(new RandomUniform	 (system, nDimensions, nParticles));
   system->set_Hamiltonian	(new HarmonicOscillator  (system));
   system->set_WaveFunction	(new TrialWaveFunction   (system));
+  //system->OPTIMIZE();
 
   if (my_rank==-1){
     system->set_Timer		(new Timer               (system));

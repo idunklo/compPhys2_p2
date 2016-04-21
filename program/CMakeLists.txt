@@ -35,6 +35,7 @@ set(HEADERS
 
 find_package(MPI REQUIRED)
 include_directories(${MPI_INCLUDE_PATH})
+include_directories(${PROJECT_SOURCE_DIR}/lib)
 add_executable(mainMPI main/main.cpp ${SOURCES} ${HEADERS})
 target_link_libraries(mainMPI ${MPI_LIBRARIES})
 
