@@ -144,21 +144,6 @@ bool System::importanceSampling()
   return true;
 }
 
-void System::set_matrix()
-{
-  int nP = my_nParticles;
-  int nD = my_nDimensions;
-  Eigen::MatrixXd Slater(nP,nP);
-  my_invSlater(nP,nP);
-  for (int p = 0 ; p < nP ; p++){
-    Slater(d,p) = my_waveFunction->singleParticle(p);
-  }
-  my_invSlater = Slater.inverse();
-  std::cout << my_invSlater << std::endl;
-}
-
-
-
 void System::OPTIMIZE()
 {
   int maxIters = 1e2;
