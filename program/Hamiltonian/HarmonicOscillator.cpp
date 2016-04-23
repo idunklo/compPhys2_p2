@@ -6,6 +6,7 @@ HarmonicOscillator::HarmonicOscillator (System* system):
 
 double HarmonicOscillator::computeNumLocalEnergy ()
 {
+/*
   double  HOLap         = 0;
   double  HOExt         = 0;
   double  Hrep          = 0;
@@ -41,10 +42,12 @@ double HarmonicOscillator::computeNumLocalEnergy ()
   HOExt = 0.5*HOExt*omega2;
 
   return HOLap + HOExt + Hrep;
+  */
 }
 
 double HarmonicOscillator::computeAnaLocalEnergy()
 {
+  /*
   const int nD          = my_system->get_nDimensions();
   const double alpha    = my_system->get_parameters()[0];
   const double beta     = my_system->get_parameters()[1];
@@ -79,4 +82,5 @@ double HarmonicOscillator::computeAnaLocalEnergy()
   HOExt = 0.5*omega*omega*(r2);
   Hrep  = 1/r12;
   return (HOLap + HOExt + Hrep);
+  */
 }

@@ -32,7 +32,7 @@ void RandomUniform::setupInitialState ()
     for(int j = 0 ; j < my_nDimensions ; j++){
       position[j] = (uniform(generator) - 0.5);
     }
-    my_system->add_particle();
+    my_system->add_particle(new Particle());
     my_system->get_particle().at(i)->set_nDimensions    (my_nDimensions);
     my_system->get_particle().at(i)->set_position       (position);
   }

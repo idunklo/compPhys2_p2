@@ -8,6 +8,7 @@
 #include <string>
 #include "mpi.h"
 #include "Eigen/Core"
+#include "Eigen/LU"
 #include "Particle.h"
 #include "../Sampler/Sampler.h"
 #include "../Hamiltonian/Hamiltonian.h"
@@ -20,28 +21,54 @@ class System
 {
  
   public:
-    System			                    (bool File);
-    ~System                         ();
-    bool metropolis		              ();
-    bool importanceSampling	        ();
-    void runMetropolis		          ();
-    void OPTIMIZE                   ();
-    void runImportanceSampling	    ();
-    void set_nDimensions	          (int nDimensions);
-    void set_nParticles	  	        (int nParticles);
-    void set_nCycles	  	          (int nCycles);
-    void set_rank                   (int my_rank);
-    void set_procs                  (int num_procs);
-    void set_stepLength		          (double stepLength);
-    void set_derivativeStep	        (double h);
-    void set_equilibrationFraction  (double equilibractionFraction);
-    void set_Hamiltonian	          (class Hamiltonian* hamiltonian);
-    void set_WaveFunction	          (class WaveFunction* waveFunction);
-    void set_InitialState	          (class InitialState* initalState);
-    void set_Timer		              (class Timer* timer);
-    void set_parameters		          (std::vector<double> parameters);
+    System			                    (bool File)
+      {my_File = File;}
+    //~System                         ()
+    // {for (int i = 0 ; i < my_particles.size() ; i++)
+    //    delete my_particles.at(i);
+    //  delete my_sampler;
+    // }
+
+    bool   metropolis		              ();
+    bool   importanceSampling	        ();
+    void   runMetropolis		          ();
+    void   OPTIMIZE                   ();
+    void   runImportanceSampling	    ();
+    double Hermite_n                  (int n, double x);
+
+    /* Set functions */
+    void set_nDimensions	          (int nDimensions)
+      { my_nDimensions = nDimensions; }
+    void set_nParticles	  	        (int nParticles)
+      { my_nParticles = nParticles; }
+    void set_nCycles	  	          (int nCycles)
+      { my_nCycles = nCycles; }
+    void set_rank                   (int rank)
+      { my_rank = rank; }
+    void set_procs                  (int procs)
+      { num_procs = procs; }
+    void set_stepLength		          (double stepLength)
+      { my_stepLength = stepLength; }
+    void set_derivativeStep	        (double h)
+      { my_derivativeStep = h; my_derivativeStep2 = h*h;}
+    void set_equilibrationFraction  (double equilibraFraction)
+      { my_equilibrationFraction = equilibraFraction; }
+    void set_Hamiltonian	          (class Hamiltonian* hamiltonian)
+      { my_hamiltonian = hamiltonian; }
+    void set_WaveFunction	          (class WaveFunction* waveFunction)
+      { my_waveFunction = waveFunction; }
+    void set_InitialState	          (class InitialState* initialState)
+      { my_initialState = initialState; }
+    void set_Timer		              (class Timer* timer)
+      { my_timer = timer; }
+    void set_parameters		          (std::vector<double> parameters)
+      { my_parameters = parameters; }
+    void add_particle (class Particle* particle)
+      { my_particles.push_back(particle); }
+
     void set_matrix                 ();
     
+    /* Return functions */
     int	    get_nDimensions		  (){return my_nDimensions;}
     int     get_nParticles	   	(){return my_nParticles;}
     int	    get_nCycles			    (){return my_nCycles;}
@@ -52,15 +79,15 @@ class System
     double  get_derivativeStep2	(){return my_derivativeStep2;}
     double  get_equilibration		(){return my_equilibrationFraction;}
     std::vector<double>& get_parameters	(){return my_parameters;}
-
+    Eigen::MatrixXd& get_DMatrix    (){return my_DMatrix;}
+    Eigen::MatrixXd& get_DMatrix_inv(){return my_DMatrix_inv;}
 
     class Hamiltonian*    get_hamiltonian   (){return my_hamiltonian;}
     class WaveFunction*		get_waveFunction  (){return my_waveFunction;}
     class Sampler*		    get_sampler       (){return	my_sampler;}
     class Timer*		      get_timer         (){return my_timer;}
     std::vector<class Particle*>&  get_particle()	{return my_particles;}
-
-    void  add_particle (); 
+    void set_DMatrix(Eigen::MatrixXd& DMatrix,Eigen::MatrixXd& DMatrix_inv,int levels);
     
   protected:
     //std::ofstream my_oFile;
@@ -75,7 +102,8 @@ class System
     double  my_derivativeStep2	      = 0.0;
     double  my_equilibrationFraction  = 0.0;
     
-    Eigen::MatrixXd my_invSlater;
+    Eigen::MatrixXd my_DMatrix;
+    Eigen::MatrixXd my_DMatrix_inv;
     std::vector<double> my_parameters	= std::vector<double>();
 
     class Hamiltonian*    my_hamiltonian	  = nullptr;
@@ -83,8 +111,8 @@ class System
     class InitialState*	  my_initialState   = nullptr;
     class Sampler*	      my_sampler	      = nullptr;
     class Timer*	        my_timer		      = nullptr;
-
     std::vector<class Particle*> my_particles = std::vector<class Particle*>();
+
 
     typedef std::chrono::high_resolution_clock clock;
     clock::time_point my_start = clock::now();

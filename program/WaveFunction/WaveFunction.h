@@ -6,7 +6,7 @@ class WaveFunction
   public:
   WaveFunction (class System* system);
 
-    virtual double evaluate		          () = 0;
+    virtual double evaluate		          (int p, int nx, int ny) = 0;
     virtual double computeQuantumForce  (int p, int d) = 0;
     virtual double computeGradient      (int p, int d) = 0;
     virtual void   computePsiBars       (double &psiBar_alpha, double &psiBar_beta)=0;
