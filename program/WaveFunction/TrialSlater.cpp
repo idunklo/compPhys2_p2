@@ -23,23 +23,60 @@ double TrialSlater::evaluate (int p, int nx, int ny)
 double TrialSlater::computeGradient(int row, int level)
 {
   int nP = my_system->get_nParticles();
+  const double omega = my_system->get_parameters()[2];
+  double grad = 0.0;
   for (int i=0; i<nP ; i++){
     const double x = my_system->get_particle()[i]->get_position()[0];
     const double y = my_system->get_particle()[i]->get_position()[1];
     switch (level)
     {
       case 0:
+        grad += -omega*x;
         break;
       case 1:
+        grad += (1-omega*x*x)*2;
         break;
       case 2:
+        grad += (4 + omega*x - 2*omega*x*x)*2;
         break;
       case 3:
+        grad += (6*x*x + 3*omega*x*x - 2*omega*x*x*x*x - 3)*4;
         break;
     }
+    grad *= exp(-omega*(x*x + y*y)*0.5);
   }
+  return grad;
 }
 
+double TrialSlater::computeLaplacian(int row, int level)
+{
+  int nP = my_system->get_nParticles();
+  const double omega = my_system->get_parameters()[2];
+  double lap = 0.0;
+  for (int i=0; i<nP ;i++){
+    const double x = my_system->get_particle()[i]->get_position()[0];
+    const double y = my_system->get_particle()[i]->get_position()[1];
+    switch (level)
+    {
+      case 0:
+        lap += (-omega + omega*x*x);
+        break;
+      case 1:
+        lap += (omega*omega*x*x*x-3*omega*x)*2;
+        break;
+      case 2:
+        lap += (2*omega*omega*x*x*x + omega - 6*omega*x);
+        break;
+      case 3:
+        lap += (48*x + 36*omega*x - 56*omega*x*x*x - 12*omega*omega*x*x*x 
+                + 8*omega*omega*x*x*x*x*x + 12*omega*x);
+        break;
+    }
+    lap *= exp(-omega*(x*x + y*y)*0.5);
+  }
+  return lap;
+
+}
 double TrialSlater::computeQuantumForce(int p, int d)
 {
   return 2*computeGradient(p,d);

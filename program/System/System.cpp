@@ -238,7 +238,7 @@ void System::set_DMatrix(Eigen::MatrixXd& DMatrix,
     for (int i=0;i<n+1;i++){
       for (int j=0;j<my_nParticles;j++){
         const double phi = my_waveFunction->evaluate(j,nx,ny);
-        my_DMatrix(row,j) = phi;
+        my_DMatrix(row,j)   = phi;
         my_DMatrix(row+1,j) = phi;
       }
       row+=2;
