@@ -12,9 +12,10 @@ void Particle::set_position (const std::vector<double> &position)
   my_position = position;
 }
 
-void Particle::changePosition (int dimension, double movement)
+void Particle::changePosition (double x, double y)
 {
-  my_position.at(dimension) += movement;
+  my_position.at(0) += x;
+  my_position.at(1) += y;
 }
 
 

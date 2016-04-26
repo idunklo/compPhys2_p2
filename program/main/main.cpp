@@ -28,41 +28,42 @@ int main (int argc,char* argv[]){
   bool    File            = false;
   const int     nDimensions     = 2;
   //const int     nParticles      = 12;
-  const int 	  nCycles	        = (int) 1e6;
-  const double  omega		        = 0.5;
+  const int 	  nCycles	        = (int) 1e5;
+  const double  omega		        = 1.0;
   const double  alpha		        = 0.95455;
   const double  beta		        = 0.50905;
   const double  a               = 1.0;
   const double  equilibration	  = 0.1;
   const double  derivativeStep  = 0.001;
-  const double  stepLength      = 5.7;
+  const double  stepLength      = 1.9;
 
-  std::vector<double> parameters {alpha, beta, omega, a};
+  std::vector<double> parameters {omega, beta, a};
   int nParticles = 0;
-  int levels     = 0;
+  int orbitals     = 0;
   
   int chosenOne  = 0;
   switch (chosenOne)
   {
     case 0:
       nParticles = 6;
-      levels     = 1;
+      orbitals     = 1;
       break;
 
     case 1:
       nParticles = 12;
-      levels     = 2;
+      orbitals     = 2;
       break;
 
     case 2:
       nParticles = 20;
-      levels     = 3;
+      orbitals     = 3;
       break;
   }
 
   System* system = new System(File);
    
   system->set_parameters		        (parameters);
+  system->set_orbitals              (orbitals);
   system->set_stepLength		        (stepLength);
   system->set_equilibrationFraction	(equilibration);
   system->set_derivativeStep		    (derivativeStep);
@@ -73,12 +74,12 @@ int main (int argc,char* argv[]){
   system->set_WaveFunction	        (new TrialSlater (system));
   system->set_InitialState	        (new RandomUniform	 (system, nDimensions, nParticles));
 
-  Eigen::MatrixXd DMatrix     (nParticles,nParticles);
-  Eigen::MatrixXd DMatrix_inv (nParticles,nParticles);
-  system->set_DMatrix(DMatrix,DMatrix_inv,levels);
-  std::cout << system->get_DMatrix()<< std::endl;
-  std::cout << system->get_DMatrix_inv()<< std::endl;
-
+  system->set_DMatrix();
+  //std::cout << system->get_DMatrix_up()<< std::endl;
+  //std::cout << system->get_DMatrix_dn()<< std::endl;
+  
+  system->runMetropolis		();
+  std::cout << "@Done@" << std::endl;
   MPI_Finalize;
   return 0;
 }

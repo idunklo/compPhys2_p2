@@ -7,7 +7,7 @@ class Particle
     Particle();
     void set_nDimensions  (int nDimensions);
     void set_position	    (const std::vector<double> &position);
-    void changePosition	  (int dimension, double adjustment);
+    void changePosition	  (double x, double y);
     std::vector<double>& get_position() {return my_position;}
 
   private:

@@ -14,7 +14,6 @@ set(SOURCES
   System/Particle.cpp
   System/System.cpp
   WaveFunction/WaveFunction.cpp
-  #  WaveFunction/TrialWaveFunction.cpp
   WaveFunction/TrialSlater.cpp
   Hamiltonian/HarmonicOscillator.cpp
   Hamiltonian/Hamiltonian.cpp
@@ -28,7 +27,6 @@ set(HEADERS
   Sampler/Timer.h
   System/System.h
   System/Particle.h
-  #WaveFunction/TrialWaveFunction.h
   WaveFunction/TrialSlater.h
   WaveFunction/WaveFunction.h
   Hamiltonian/Hamiltonian.h

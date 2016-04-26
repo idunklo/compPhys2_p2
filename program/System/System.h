@@ -35,6 +35,10 @@ class System
     void   OPTIMIZE                   ();
     void   runImportanceSampling	    ();
     double Hermite_n                  (int n, double x);
+    void   update_inverse             (Eigen::MatrixXd& matrix_inv,
+                                       Eigen::MatrixXd& matrix,
+                                       Eigen::VectorXd& new_row,
+                                       int i, double R_SD);
 
     /* Set functions */
     void set_nDimensions	          (int nDimensions)
@@ -43,6 +47,8 @@ class System
       { my_nParticles = nParticles; }
     void set_nCycles	  	          (int nCycles)
       { my_nCycles = nCycles; }
+    void set_orbitals               (int orbitals)
+      { my_orbitals = orbitals; }
     void set_rank                   (int rank)
       { my_rank = rank; }
     void set_procs                  (int procs)
@@ -53,6 +59,10 @@ class System
       { my_derivativeStep = h; my_derivativeStep2 = h*h;}
     void set_equilibrationFraction  (double equilibraFraction)
       { my_equilibrationFraction = equilibraFraction; }
+    void set_SDLap_up               (double SDLap_up)
+      { my_SDLap_old_up = SDLap_up; }
+    void set_SDLap_dn               (double SDLap_dn)
+      { my_SDLap_old_dn = SDLap_dn; }
     void set_Hamiltonian	          (class Hamiltonian* hamiltonian)
       { my_hamiltonian = hamiltonian; }
     void set_WaveFunction	          (class WaveFunction* waveFunction)
@@ -65,8 +75,7 @@ class System
       { my_parameters = parameters; }
     void add_particle (class Particle* particle)
       { my_particles.push_back(particle); }
-
-    void set_matrix                 ();
+    void set_DMatrix();
     
     /* Return functions */
     int	    get_nDimensions		  (){return my_nDimensions;}
@@ -74,43 +83,57 @@ class System
     int	    get_nCycles			    (){return my_nCycles;}
     int     get_rank            (){return my_rank;}
     int     get_procs           (){return num_procs;}
+    int     get_orbitals        (){return my_orbitals;}
+    int     get_spin            (){return my_spin;}
     double  get_stepLength	    (){return my_stepLength;}
     double  get_derivativeStep	(){return my_derivativeStep;}
     double  get_derivativeStep2	(){return my_derivativeStep2;}
     double  get_equilibration		(){return my_equilibrationFraction;}
+    double  get_SDLap_old_up    (){return my_SDLap_old_up;}
+    double  get_SDLap_old_dn    (){return my_SDLap_old_dn;}
     std::vector<double>& get_parameters	(){return my_parameters;}
-    Eigen::MatrixXd& get_DMatrix    (){return my_DMatrix;}
-    Eigen::MatrixXd& get_DMatrix_inv(){return my_DMatrix_inv;}
+    Eigen::MatrixXd& get_DMatrix_up     (){return my_DMatrix_up;}
+    Eigen::MatrixXd& get_DMatrix_up_inv (){return my_DMatrix_up_inv;}
+    Eigen::MatrixXd& get_DMatrix_dn     (){return my_DMatrix_dn;}
+    Eigen::MatrixXd& get_DMatrix_dn_inv (){return my_DMatrix_dn_inv;}
+    Eigen::MatrixXd& get_r_ij           (){return my_r_ij;}
 
     class Hamiltonian*    get_hamiltonian   (){return my_hamiltonian;}
     class WaveFunction*		get_waveFunction  (){return my_waveFunction;}
     class Sampler*		    get_sampler       (){return	my_sampler;}
     class Timer*		      get_timer         (){return my_timer;}
     std::vector<class Particle*>&  get_particle()	{return my_particles;}
-    void set_DMatrix(Eigen::MatrixXd& DMatrix,Eigen::MatrixXd& DMatrix_inv,int levels);
     
   protected:
     //std::ofstream my_oFile;
-    bool    my_File		                = false;
-    int     my_rank                   = 0;
-    int     num_procs                 = 1;
-    int     my_nDimensions		        = 0;
-    int     my_nParticles		          = 0;
-    int     my_nCycles		            = 0;
-    double  my_stepLength	            = 0.0;
-    double  my_derivativeStep	        = 0.0;
-    double  my_derivativeStep2	      = 0.0;
-    double  my_equilibrationFraction  = 0.0;
+    bool   my_File                  = false;
+    int    rejects                  = 0;
+    int    my_rank                  = 0;
+    int    num_procs                = 1;
+    int    my_orbitals              = 0;
+    int    my_nDimensions           = 0;
+    int    my_nParticles            = 0;
+    int    my_nCycles               = 0;
+    int    my_spin                  = 0;
+    double my_stepLength            = 0.0;
+    double my_derivativeStep        = 0.0;
+    double my_derivativeStep2       = 0.0;
+    double my_equilibrationFraction = 0.0;
+    double my_SDLap_old_up          = 0.0;
+    double my_SDLap_old_dn          = 0.0;
     
-    Eigen::MatrixXd my_DMatrix;
-    Eigen::MatrixXd my_DMatrix_inv;
+    Eigen::MatrixXd my_DMatrix_up;
+    Eigen::MatrixXd my_DMatrix_dn;
+    Eigen::MatrixXd my_DMatrix_up_inv;
+    Eigen::MatrixXd my_DMatrix_dn_inv;
+    Eigen::MatrixXd my_r_ij;
     std::vector<double> my_parameters	= std::vector<double>();
 
-    class Hamiltonian*    my_hamiltonian	  = nullptr;
+    class Hamiltonian*    my_hamiltonian    = nullptr;
     class WaveFunction*	  my_waveFunction  	= nullptr;
     class InitialState*	  my_initialState   = nullptr;
-    class Sampler*	      my_sampler	      = nullptr;
-    class Timer*	        my_timer		      = nullptr;
+    class Sampler*	      my_sampler        = nullptr;
+    class Timer*          my_timer          = nullptr;
     std::vector<class Particle*> my_particles = std::vector<class Particle*>();
 
 

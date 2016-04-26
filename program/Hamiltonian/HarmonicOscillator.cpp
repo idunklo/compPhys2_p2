@@ -4,6 +4,57 @@ HarmonicOscillator::HarmonicOscillator (System* system):
   Hamiltonian(system)
 {}
 
+double HarmonicOscillator::computeAnaLocalEnergy()
+{
+  const int orbitals = my_system->get_orbitals();
+  const int spin     = my_system->get_spin();
+  const int nP       = my_system->get_nParticles();
+  const int nD       = my_system->get_nDimensions();
+  double Grads  = 0.0;
+  double SD_LAP = 0.0;
+  double SD_LAP_new = 0.0;
+  int startPos  = 0;
+  int orbital   = 0;
+  if(spin){
+    SD_LAP = my_system->get_SDLap_old_dn();
+    startPos=nP/2;
+  }
+  else{
+    SD_LAP = my_system->get_SDLap_old_up();
+  }
+  for (int shell = 0 ; shell <= orbitals ; shell++){
+    int nx = shell; int ny = 0;
+    for (int state = 0 ; state <= shell ; state++){
+      for (int pos = startPos ; pos<(2*startPos) ; pos++){
+        for (int d = 0 ; d < nD ; d++){
+          if(d==0){orbital=nx;}
+          else{orbital=ny;}
+          SD_LAP_new += my_system->get_waveFunction()->LapPhi(pos,orbital);
+        }
+      }
+      nx -= 1; ny += 1;
+    }
+  }
+  const double JastrowLap= my_system->get_waveFunction()->LapJas();
+  double GradSum = 0.0;
+  for (int i = 0 ; i<nP ; i++){
+    for (int d = 0 ; d < nD ; d++){
+      const double phi = my_system->get_waveFunction()->GradPhi(i,d);
+      const double jas = my_system->get_waveFunction()->GradJas(i,d);
+      GradSum += phi*jas; 
+    }
+  }
+
+  if(spin){
+    my_system->set_SDLap_up(SD_LAP_new);
+  }
+  else{
+    my_system->set_SDLap_dn(SD_LAP_new);
+  }
+  SD_LAP += SD_LAP_new; 
+  return SD_LAP + JastrowLap + 2*GradSum;
+}
+
 double HarmonicOscillator::computeNumLocalEnergy ()
 {
 /*
@@ -45,42 +96,3 @@ double HarmonicOscillator::computeNumLocalEnergy ()
   */
 }
 
-double HarmonicOscillator::computeAnaLocalEnergy()
-{
-  /*
-  const int nD          = my_system->get_nDimensions();
-  const double alpha    = my_system->get_parameters()[0];
-  const double beta     = my_system->get_parameters()[1];
-  const double omega    = my_system->get_parameters()[2];
-  const double a        = my_system->get_parameters()[3];
-  const double alom     = alpha*omega;
-  double       HOLap    = 0;
-  double       HOExt    = 0;
-  double       Hrep     = 0;
-  double       r2       = 0;
-  double       sep2     = 0;
-  
-  for (int d = 0 ; d < nD ; d++){
-    const double x1   = my_system->get_particle()[0]->get_position()[d];
-    const double x2   = my_system->get_particle()[1]->get_position()[d];
-    const double sep  = x1-x2;
-    r2   += x1*x1+x2*x2;
-    sep2 += sep*sep;
-  }
-
-  const double r12        = sqrt(sep2);
-  const double opbr12     = 1 + beta*r12;
-  const double opbr122    = opbr12*opbr12;
-  const double a_opbr122  = a/opbr122;
-
-  HOLap = alom*alom*r2 
-          -4*alom 
-          -2*alom*r12*a_opbr122
-          +2*(a_opbr122)*(a_opbr122 + (1-beta*r12)/(r12*opbr12));
-
-  HOLap = -0.5*HOLap;
-  HOExt = 0.5*omega*omega*(r2);
-  Hrep  = 1/r12;
-  return (HOLap + HOExt + Hrep);
-  */
-}

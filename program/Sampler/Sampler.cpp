@@ -27,7 +27,7 @@ void Sampler::sample (bool accepted)
 
   //double localEnergy = my_system->get_hamiltonian()->computeNumLocalEnergy();
   double localEnergy = my_system->get_hamiltonian()->computeAnaLocalEnergy();
-
+  /*
   if (my_oEnergies.is_open())
   {
     my_oEnergies.write(reinterpret_cast<char *>(&localEnergy),sizeof(double));
@@ -42,12 +42,14 @@ void Sampler::sample (bool accepted)
     }
     my_oPositions << "\n";
   }
+  */
   //else
   //{
     cumulativeEnergy	        += localEnergy;
-    cumulativeEnergy2	        += localEnergy*localEnergy;
+  //  cumulativeEnergy2	        += localEnergy*localEnergy;
     cumulativeAcceptanceRate  += accepted;
     my_stepNumber		          += 1;
+    //std::cout << my_stepNumber << std::endl;
   //}
 } 
 
@@ -59,8 +61,11 @@ void Sampler::printResults ()
   if (my_oPositions.is_open())
     my_oPositions.close();
 
+  cout << cumulativeAcceptanceRate << endl; 
+  cout << cumulativeAcceptanceRate/(double)my_stepNumber << endl;
+  cout << cumulativeEnergy/(double)my_stepNumber << endl;
   //if(my_system->get_rank()==0){
-
+/*
     double totalExpect  = 0;
     double totalExpect2 = 0;
     double totalVar	    = 0;
@@ -116,4 +121,5 @@ void Sampler::printResults ()
     //printf("\033[0;91mVariance:                %e\033[0;m\n",variance);
     //printf("\033[0;91mAcceptance ratio:        %f\033[0;m\n",acceptanceRatio);
   }
+  */
 }
