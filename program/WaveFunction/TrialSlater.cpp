@@ -4,10 +4,10 @@ using std::cout;
 using std::endl;
 
 TrialSlater::TrialSlater (System* system) :
-  WaveFunction(system){
-  }
+  WaveFunction(system)
+{}
 
-double TrialSlater::evaluate (int p, int nx, int ny)
+double TrialSlater::Phi(int p, int nx, int ny)
 {
   const double x = my_system->get_particle().at(p)->get_position().at(0);
   const double y = my_system->get_particle().at(p)->get_position().at(1);
@@ -15,11 +15,27 @@ double TrialSlater::evaluate (int p, int nx, int ny)
   const double omegasq = sqrt(omega);
   const double Hnx = my_system->Hermite_n(nx,omegasq*x);
   const double Hny = my_system->Hermite_n(ny,omegasq*y);
-  
+ 
   //cout << Hnx*Hny*exp(-omega*(x*x+y*y)*0.5)<<endl;
   return Hnx*Hny*exp(-omega*(x*x+y*y)*0.5);
 }
 
+double TrialSlater::computeJastrow ()
+{
+  const int nP        = my_system->get_nParticles();
+  const int nP_2      = nP/2;
+  const double beta   = my_system->get_parameters().at(1);
+  const Eigen::MatrixXd rij = my_system->get_r_ij();
+  double argument     = 0.0;
+  for (int i=0 ; i<nP; i++){
+    for (int j=i+1 ; j<nP; j++){
+      const double sep = rij(i,j);
+      const double a   = 1-((i<nP_2)*(j>=nP_2)!=1)*(2.0/3.0);
+      argument += a*sep/(1+beta*sep); 
+    }
+  }
+  return 1;//exp(argument);
+}
 
 double TrialSlater::GradPhi(int pos, int d)
 {
@@ -49,7 +65,7 @@ double TrialSlater::GradPhi(int pos, int d)
           Grad += (6*x*x + 3*omega*x*x - 2*omega*x*x*x*x - 3)*4;
           break;
       }
-      nx -= 1; ny += 1;
+      nx--; ny++;
     }
   }
   return Grad;
@@ -58,18 +74,22 @@ double TrialSlater::GradPhi(int pos, int d)
 double TrialSlater::GradJas(int k, int d)
 {
   const int nP         = my_system->get_nParticles();
+  const int nP_2       = nP/2;
   const double beta    = my_system->get_parameters().at(1);
-  const double a       = my_system->get_parameters().at(2);
-  Eigen::MatrixXd r_ij = my_system->get_r_ij();
+  const Eigen::MatrixXd r_ij = my_system->get_r_ij();
   double Grad = 0.0;
   const double xk = my_system->get_particle().at(k)->get_position().at(d);
-  for (int j = 0 ; j<nP ; j++){
-    if(j!=k){
-      const double xj = my_system->get_particle().at(j)->get_position().at(d);
-      Grad += (xk-xj)/(r_ij(k,j)*(1+beta*r_ij(k,j))*(1+beta*r_ij(k,j)));
-    }
+  for (int j = 0 ; j < k ; j++){
+    const double a   = 1-((k<nP_2)*(j>=nP_2)!=1)*(2.0/3.0);
+    const double xj = my_system->get_particle().at(j)->get_position().at(d);
+    Grad += a*(xk-xj)/(r_ij(j,k)*(1+beta*r_ij(k,j))*(1+beta*r_ij(k,j)));
   }
-  return Grad*a;
+  for (int j = k+1 ; j<nP ; j++){
+    const double a   = 1-((k<nP_2)*(j>=nP_2)!=1)*(2.0/3.0);
+    const double xj = my_system->get_particle().at(j)->get_position().at(d);
+    Grad += a*(xk-xj)/(r_ij(k,j)*(1+beta*r_ij(k,j))*(1+beta*r_ij(k,j)));
+  }
+  return Grad*0;
 }
 
 double TrialSlater::LapPhi(int pos,int orbital)
@@ -84,7 +104,7 @@ double TrialSlater::LapPhi(int pos,int orbital)
         Lap += (x*x - 1);
         break;
       case 1:
-        Lap += (omega*x*x*x-3*x)*2;
+        Lap += (omega*x*x*x - 3*x)*2;
         break;
       case 2:
         Lap += (2*omega*x*x*x + 1 - 6*x);
@@ -101,9 +121,9 @@ double TrialSlater::LapPhi(int pos,int orbital)
 double TrialSlater::LapJas()
 {
   const int nP         = my_system->get_nParticles();
+  const int nP_2       = nP/2;
   const double beta    = my_system->get_parameters().at(1);
-  const double a       = my_system->get_parameters().at(2);
-  Eigen::MatrixXd r_ij = my_system->get_r_ij();
+  const Eigen::MatrixXd r_ij = my_system->get_r_ij();
   double term1= 0.0;
   double term2= 0.0;
   double Lap  = 0.0;
@@ -114,41 +134,24 @@ double TrialSlater::LapJas()
     for (int i=k+1 ; i<nP ; i++){
       const double xi = my_system->get_particle().at(i)->get_position().at(0);
       const double yi = my_system->get_particle().at(i)->get_position().at(1);
+      const double aki= 1-((k<nP_2)*(i>=nP_2)!=1)*(2.0/3.0);
       const double r_ki = r_ij(k,i);
       const double jast_ki = 1/((1+beta*r_ki)*(1+beta*r_ki));
       for(int j=k+1 ; j<nP ; j++){
         const double xj = my_system->get_particle().at(j)->get_position().at(0);
         const double yj = my_system->get_particle().at(j)->get_position().at(1);
-        //const double r_kj = sqrt((xk-xj)*(xk-xj) + (yk-yj)*(yk-yj));
+        const double akj= 1-((k<nP_2)*(j>=nP_2)!=1)*(2.0/3.0);
         const double r_kj = r_ij(k,j); 
         const double jast_kj = 1/((1+beta*r_kj)*(1+beta*r_kj));
         const double rkri_rkrj = (xk-xi)*(xk-xj)+(yk-yi)*(yk-yj);
-        term1 += rkri_rkrj*jast_ki*jast_kj/(r_kj*r_ki);
+        term1 += akj*rkri_rkrj*jast_kj/r_kj;
       }
-      term2 += (1+2*beta*r_ki)/(r_ki*(1+beta*r_ki)*(1+beta*r_ki)*(1+beta*r_ki));
+      term1 *= aki*jast_ki/r_ki;
+      term2 += aki*(1+2*beta*r_ki)/(r_ki*(1+beta*r_ki)*(1+beta*r_ki)*(1+beta*r_ki));
     }
-    term2 *= 2;
-    Lap += a*(term1+term2);
+    Lap += (term1+2*term2);
   }
-  return Lap;
-}
-
-double TrialSlater::computeJastrow ()
-{
-  const int nP      = my_system->get_nParticles();
-  const double beta = my_system->get_parameters().at(1);
-  const double a    = my_system->get_parameters().at(2);
-  double sep = 0.0;
-  for (int p1=0 ; p1<nP; p1++){
-    const double x1 = my_system->get_particle().at(p1)->get_position().at(0);
-    const double y1 = my_system->get_particle().at(p1)->get_position().at(1);
-    for (int p2=p1+1 ; p2<nP; p2++){
-      const double x2 = my_system->get_particle().at(p2)->get_position().at(0);
-      const double y2 = my_system->get_particle().at(p2)->get_position().at(1);
-      sep += sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
-    }
-  }
-  return (a*sep)/(1+beta*sep);
+  return Lap*0;
 }
 
 double TrialSlater::computeQuantumForce(int p, int d)
@@ -177,4 +180,3 @@ void TrialSlater::computePsiBars(double &psiBar_alpha,
   psiBar_beta  = -a*r12*r12/((1+beta*r12)*(1+beta*r12));
   */
 }
-

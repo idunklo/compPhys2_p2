@@ -25,8 +25,11 @@ void Sampler::sample (bool accepted)
     cumulativeAcceptanceRate  = 0;
   }
 
-  //double localEnergy = my_system->get_hamiltonian()->computeNumLocalEnergy();
-  double localEnergy = my_system->get_hamiltonian()->computeAnaLocalEnergy();
+  double localEnergy = my_system->get_hamiltonian()->computeLocalEnergy();
+  //for (int p = 0 ; p < my_system->get_nParticles() ; p++){
+  //  cout << my_system->get_particle()[p]->get_position()[0] << "  " ;
+  //  cout << my_system->get_particle()[p]->get_position()[0] << endl;
+  //} 
   /*
   if (my_oEnergies.is_open())
   {
@@ -46,7 +49,7 @@ void Sampler::sample (bool accepted)
   //else
   //{
     cumulativeEnergy	        += localEnergy;
-  //  cumulativeEnergy2	        += localEnergy*localEnergy;
+    cumulativeEnergy2	        += localEnergy*localEnergy;
     cumulativeAcceptanceRate  += accepted;
     my_stepNumber		          += 1;
     //std::cout << my_stepNumber << std::endl;
@@ -61,9 +64,15 @@ void Sampler::printResults ()
   if (my_oPositions.is_open())
     my_oPositions.close();
 
-  cout << cumulativeAcceptanceRate << endl; 
-  cout << cumulativeAcceptanceRate/(double)my_stepNumber << endl;
-  cout << cumulativeEnergy/(double)my_stepNumber << endl;
+  //cout << cumulativeAcceptanceRate << endl; 
+  double expectationValue    = cumulativeEnergy/(double)my_stepNumber;
+  double expectationValue2   = cumulativeEnergy2/(double)my_stepNumber;
+  double variance	       = (expectationValue2 - expectationValue * expectationValue)/
+                            (double)my_stepNumber;
+  cout << "Accept Ratio:     " << cumulativeAcceptanceRate/(double)my_stepNumber << endl;
+  cout << "Expect Value:     " << expectationValue<< endl;
+  cout << "Varian Ceeee:     " << variance << endl;
+  
   //if(my_system->get_rank()==0){
 /*
     double totalExpect  = 0;

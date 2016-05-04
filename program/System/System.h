@@ -35,6 +35,7 @@ class System
     void   OPTIMIZE                   ();
     void   runImportanceSampling	    ();
     double Hermite_n                  (int n, double x);
+    void   update_r_ij                (int pos);
     void   update_inverse             (Eigen::MatrixXd& matrix_inv,
                                        Eigen::MatrixXd& matrix,
                                        Eigen::VectorXd& new_row,

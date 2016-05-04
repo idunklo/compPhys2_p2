@@ -7,8 +7,10 @@ class Hamiltonian
 
     Hamiltonian (class System* system);
 
-    virtual double computeNumLocalEnergy () = 0;
-    virtual double computeAnaLocalEnergy () = 0;
+    virtual double computeLocalEnergy    () = 0;
+    virtual double HOLap                 () = 0;
+    virtual double HOExt                 () = 0;
+    virtual double HRep                  () = 0;
 
   protected:
     

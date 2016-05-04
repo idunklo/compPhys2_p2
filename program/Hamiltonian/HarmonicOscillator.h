@@ -7,7 +7,9 @@ class HarmonicOscillator : public Hamiltonian
     
     HarmonicOscillator( System* system);
 
-    double  computeNumLocalEnergy	  ();
-    double  computeAnaLocalEnergy   ();
+    double  computeLocalEnergy      ();
+    double  HOLap                   ();
+    double  HOExt                   ();
+    double  HRep                    ();
 };
 

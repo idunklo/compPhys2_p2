@@ -1,5 +1,4 @@
 #include "System.h"
-#include "unistd.h"
 
 using std::cout;
 using std::endl;
@@ -18,7 +17,7 @@ void System::runMetropolis ()
     if (cycle > my_equilibrationFraction * my_nCycles)
       my_sampler->sample(accepted);
   }
-  std::cout << rejects << std::endl;
+  //std::cout << rejects << std::endl;
   my_sampler->printResults();
 }
 
@@ -67,10 +66,10 @@ bool System::metropolis ()
   randY = my_stepLength*(my_uniform(my_generator)-0.5);
   
   /* Getting column from inverse SD */
-  //if (my_spin)
-  //  d_inv = my_DMatrix_up_inv.col(elected);
-  //else
-  //  d_inv = my_DMatrix_dn_inv.col(elected-detSize);
+  if (my_spin)
+    d_inv = my_DMatrix_up_inv.col(elected);
+  else
+    d_inv = my_DMatrix_dn_inv.col(elected-detSize);
 
   /* Calculating correlation ratio */
   //cout << endl;
@@ -78,46 +77,61 @@ bool System::metropolis ()
   DMatrix_old_dn = my_DMatrix_dn;
   double R_SD_old = my_DMatrix_up.determinant()*
                     my_DMatrix_dn.determinant();
+  //cout  << my_DMatrix_up.inverse() << endl;
 
   R_C = my_waveFunction->computeJastrow();
-  //cout << R_C << endl;
+  //cout << R_C << "  ";
   my_particles[elected]->changePosition(randX,randY);
+  update_r_ij(elected);
   //cout << my_waveFunction->computeJastrow() << endl;
   R_C = my_waveFunction->computeJastrow()/R_C;
+  //cout << R_C << endl;
   //cout << endl;
-
 
   /* Calculating new row for SD */
   for (int n=0;n<=my_orbitals;n++){
     int nx = n; int ny = 0;
-    for (int state=0;state<n+1;state++){
-      const double phi = my_waveFunction->evaluate(elected,nx,ny);
+    for (int state=0;state<=n;state++){
+      const double phi = my_waveFunction->Phi(elected,nx,ny);
       //cout << phi <<" ";
       //R_SD += phi*d_inv(i);
       SD_row_i(i) = phi;
-      i++;
-      nx -= 1; ny += 1;
+      i++; nx -= 1; ny += 1;
     }
   }
-  if(my_spin){
-    my_DMatrix_up.col(elected) = SD_row_i;
-  }
-  else{
-    my_DMatrix_dn.col(elected-detSize) = SD_row_i;
-  }
+  //cout << endl;
+  //cout << SD_row_i << endl;
+  if(my_spin)
+    my_DMatrix_up.row(elected) = SD_row_i;
+  else
+    my_DMatrix_dn.row(elected-detSize) = SD_row_i;
+  
 
   double R_SD_new = my_DMatrix_up.determinant()*
                     my_DMatrix_dn.determinant();
 
+  //R_SD = R_SD_new/R_SD_old;
   R_SD = (R_SD_new*R_SD_new)/(R_SD_old*R_SD_old);
   R_C *= R_C;
-  //cout << d_inv << endl;
+
+  //cout << R_SD_new*R_SD_new << "/" << R_SD_old*R_SD_old << " = " 
+  //  << R_SD << endl;
+  //cout << R_C << endl;
   const double RATIO = fabs(R_SD*R_C);
+  //cout << RATIO << endl;
+  //cout << "-------------------------" << endl;
+  //cout << my_r_ij << endl;
+  //cout << my_DMatrix_up_inv << endl;
   /* Checking acceptance */
   //cout << fabs(R_SD*R_C) << endl;
+  //cout << my_DMatrix_dn << endl;
+  //cout << "inverse\n" << my_DMatrix_dn_inv << endl;
+  //cout << endl;
+
   if (RATIO < my_uniform(my_generator)){
     rejects += 1;
     my_particles.at(elected)->changePosition(-randX,-randY);
+    update_r_ij(elected);
     my_DMatrix_up = DMatrix_old_up;
     my_DMatrix_dn = DMatrix_old_dn;
     return false;
@@ -134,12 +148,29 @@ bool System::metropolis ()
     //                 SD_row_i, elected-detSize, R_SD);
     //  my_DMatrix_dn.row(elected-detSize) = SD_row_i;
     //}
+    //cout << my_DMatrix_up_inv << endl;
     my_DMatrix_up_inv = my_DMatrix_up.inverse();
     my_DMatrix_dn_inv = my_DMatrix_dn.inverse();
     return true;
   }
 }
-
+void System::update_r_ij (int pos)
+{
+  const double xk = my_particles.at(pos)->get_position().at(0);
+  const double yk = my_particles.at(pos)->get_position().at(1);
+  for (int i = 0 ; i < pos; i++){
+    const double xi = my_particles.at(i)->get_position().at(0);
+    const double yi = my_particles.at(i)->get_position().at(1);
+    const double sep= sqrt((xk-xi)*(xk-xi) + (yk-yi)*(yk-yi));
+    my_r_ij(i,pos) = sep; 
+  }
+  for (int j = pos+1; j < my_nParticles ; j++){
+    const double xj = my_particles.at(j)->get_position().at(0);
+    const double yj = my_particles.at(j)->get_position().at(1);
+    const double sep= sqrt((xk-xj)*(xk-xj) + (yk-yj)*(yk-yj));
+    my_r_ij(pos,j) = sep;
+  }
+}
 void System::update_inverse(Eigen::MatrixXd& matrix_inv, 
                             Eigen::MatrixXd& matrix,
                             Eigen::VectorXd& new_row,
@@ -268,7 +299,7 @@ void System::OPTIMIZE()
       if (metropolis()){
         my_waveFunction->computePsiBars(psiBar_alpha,psiBar_beta);
         
-        double localEnergy = get_hamiltonian()->computeNumLocalEnergy();
+        double localEnergy = get_hamiltonian()->computeLocalEnergy();
         cumElocal       += localEnergy;
         cumEPsi_alpha   += localEnergy*psiBar_alpha;
         cumEPsi_beta    += localEnergy*psiBar_beta;
@@ -326,13 +357,17 @@ void System::set_DMatrix()
   Eigen::MatrixXd DMatrix1 (nP/2,nP/2);
   Eigen::MatrixXd DMatrix2 (nP/2,nP/2);
   Eigen::MatrixXd r_ij     (nP,nP);
+  DMatrix1.setZero();
+  DMatrix2.setZero();
+  r_ij.setZero();
+  //r_ij = Eigen::MatrixXd::Zero(nP,nP);
   int row = 0;
   for (int n=0;n<=my_orbitals;n++){
     int nx = n; int ny = 0;
     for (int i=0;i<n+1;i++){
       for (int j=0;j<my_nParticles/2;j++){
-        const double phi1 = my_waveFunction->evaluate(j,nx,ny);
-        const double phi2 = my_waveFunction->evaluate(j+nP/2-1,nx,ny);
+        const double phi1 = my_waveFunction->Phi(j,nx,ny);
+        const double phi2 = my_waveFunction->Phi(j+nP/2-1,nx,ny);
         DMatrix1(row,j) = phi1;
         DMatrix2(row,j) = phi2;
       }
@@ -343,11 +378,15 @@ void System::set_DMatrix()
   my_DMatrix_dn     = DMatrix2;
   my_DMatrix_up_inv = DMatrix1.inverse();
   my_DMatrix_dn_inv = DMatrix2.inverse();
+  //cout << my_DMatrix_up_inv << endl;
+  //cout << my_DMatrix_dn_inv << endl;
+  //cout << my_DMatrix_up << endl;
+  //cout << my_DMatrix_dn << endl;
 
   for (int i = 0 ; i < nP ; i++){
     const double xi = my_particles.at(i)->get_position().at(0);
     const double yi = my_particles.at(i)->get_position().at(1);
-    for (int j = i+1 ; j < nP ; j++){
+    for (int j = i ; j < nP ; j++){
       const double xj = my_particles.at(j)->get_position().at(0);
       const double yj = my_particles.at(j)->get_position().at(1);
       const double sep= sqrt((xi-xj)*(xi-xj) + (yi-yj)*(yi-yj));

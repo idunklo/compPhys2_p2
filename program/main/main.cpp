@@ -28,35 +28,34 @@ int main (int argc,char* argv[]){
   bool    File            = false;
   const int     nDimensions     = 2;
   //const int     nParticles      = 12;
-  const int 	  nCycles	        = (int) 1e5;
+  const int 	  nCycles	        = (int) 1e4;
   const double  omega		        = 1.0;
-  const double  alpha		        = 0.95455;
+  //const double  alpha		        = 0.95455;
   const double  beta		        = 0.50905;
   const double  a               = 1.0;
-  const double  equilibration	  = 0.1;
+  const double  equilibration	  = 0.2;
   const double  derivativeStep  = 0.001;
-  const double  stepLength      = 1.9;
+  const double  stepLength      = 2.0;
 
-  std::vector<double> parameters {omega, beta, a};
+  std::vector<double> parameters {omega, beta};
   int nParticles = 0;
-  int orbitals     = 0;
-  
+  int orbitals   = 0;
   int chosenOne  = 0;
   switch (chosenOne)
   {
     case 0:
       nParticles = 6;
-      orbitals     = 1;
+      orbitals   = 1;
       break;
 
     case 1:
       nParticles = 12;
-      orbitals     = 2;
+      orbitals   = 2;
       break;
 
     case 2:
       nParticles = 20;
-      orbitals     = 3;
+      orbitals   = 3;
       break;
   }
 
@@ -79,7 +78,6 @@ int main (int argc,char* argv[]){
   //std::cout << system->get_DMatrix_dn()<< std::endl;
   
   system->runMetropolis		();
-  std::cout << "@Done@" << std::endl;
   MPI_Finalize;
   return 0;
 }
