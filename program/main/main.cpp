@@ -28,7 +28,7 @@ int main (int argc,char* argv[]){
   bool    File            = false;
   const int     nDimensions     = 2;
   //const int     nParticles      = 12;
-  const int 	  nCycles	        = (int) 1e4;
+  const int 	  nCycles	        = (int) 1e5;
   const double  omega		        = 1.0;
   //const double  alpha		        = 0.95455;
   const double  beta		        = 0.50905;
@@ -56,6 +56,10 @@ int main (int argc,char* argv[]){
     case 2:
       nParticles = 20;
       orbitals   = 3;
+      break;
+    case 3:
+      nParticles = 2;
+      orbitals   = 0;
       break;
   }
 

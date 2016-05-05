@@ -47,21 +47,20 @@ double HarmonicOscillator::HOLap()
                        *D_inv(row,r-startPos);
           SD_LAP_new += my_system->get_waveFunction()->LapPhi(r,ny)
                        *D_inv(row,r-startPos);
-          //cout << "LaPh: " << my_system->get_waveFunction()->LapPhi(r,nx) << "  "
-          //  << "D_inv: "<< D_inv(row,r-startPos) << endl;
-          //cout << SD_LAP_new << endl;
-          //cout << "shell: " << shell;
-          //cout << "  state: " << state;
-          //cout << "  nx: " << nx;
-          //cout << "  ny: " << ny;
-          //cout << "  phi_"<< row <<"("<<pos<<")"<<endl;
-        //}
+          if(my_system->get_waveFunction()->LapPhi(r,nx) > 7){
+
+          cout << "LaPh: " << my_system->get_waveFunction()->LapPhi(r,nx) << "  "
+            << "D_inv: "<< D_inv(row,r-startPos) << endl;
+          cout << "shell: " << shell;
+          cout << "  state: " << state;
+          cout << "  nx: " << nx;
+          cout << "  ny: " << ny;
+          cout << "  phi_"<< row <<"("<<r<<")"<<endl;
+        }
       }
       row++; nx--;ny++;
     }
   }
-  
-
   
   //cout << "Sd " << SD_LAP_new << endl;
   const double JastrowLap= my_system->get_waveFunction()->LapJas();
@@ -80,10 +79,11 @@ double HarmonicOscillator::HOLap()
   else{
     my_system->set_SDLap_dn(SD_LAP_new);
   }
-  //cout << SD_LAP << "  " << SD_LAP_new << endl;
+  //if (SD_LAP_new > 400)
+  //  cout << "IIIK " << SD_LAP << "  " << SD_LAP_new << endl;
   SD_LAP += SD_LAP_new; 
   //cout << SD_LAP << "  " << JastrowLap << "  " << 2*totGrad << endl;
-  return -0.5*(SD_LAP + JastrowLap + 2*totGrad);
+  return -0.5*(SD_LAP);// + JastrowLap + 2*totGrad);
 }
 
 double HarmonicOscillator::HOExt()

@@ -34,7 +34,7 @@ double TrialSlater::computeJastrow ()
       argument += a*sep/(1+beta*sep); 
     }
   }
-  return 1;//exp(argument);
+  return exp(argument);
 }
 
 double TrialSlater::GradPhi(int pos, int d)
@@ -43,8 +43,11 @@ double TrialSlater::GradPhi(int pos, int d)
   const double omega = my_system->get_parameters()[0];
   const int orbitals = my_system->get_orbitals();
   const double x = my_system->get_particle()[pos]->get_position()[d];
+  const double xi=  my_system->get_particle()[pos]->get_position()[0];
+  const double yi=  my_system->get_particle()[pos]->get_position()[1];
   int orbital = 0;
   double Grad = 0.0;
+  double arg  = 0.0;
   for (int shell = 0 ; shell <= orbitals ; shell++){
     int nx = shell; int ny = 0;
     for (int state = 0 ; state <= shell ; state++){
@@ -68,7 +71,7 @@ double TrialSlater::GradPhi(int pos, int d)
       nx--; ny++;
     }
   }
-  return Grad;
+  return Grad*exp(-omega*(xi*xi+yi*yi)/2);
 }
 
 double TrialSlater::GradJas(int k, int d)
@@ -89,12 +92,13 @@ double TrialSlater::GradJas(int k, int d)
     const double xj = my_system->get_particle().at(j)->get_position().at(d);
     Grad += a*(xk-xj)/(r_ij(k,j)*(1+beta*r_ij(k,j))*(1+beta*r_ij(k,j)));
   }
-  return Grad*0;
+  return Grad;
 }
 
 double TrialSlater::LapPhi(int pos,int orbital)
 {
   double Lap = 0.0;
+  double arg = 0.0;
   const double omega = my_system->get_parameters().at(0);
   for (int xi = 0 ; xi < 2 ; xi++){
     const double x = my_system->get_particle()[pos]->get_position()[xi];
@@ -107,15 +111,18 @@ double TrialSlater::LapPhi(int pos,int orbital)
         Lap += (omega*x*x*x - 3*x)*2;
         break;
       case 2:
-        Lap += (2*omega*x*x*x + 1 - 6*x);
+        Lap += (4*omega*x*x*x*x - 2*omega*x*x-20*x*x +2 +8/omega);
+        //Lap += (2*omega*x*x*x + 1 - 6*x);
         break;
       case 3:
         Lap += (48*x/omega + 36*x - 56*x*x*x - 12*omega*x*x*x 
-                + 8*omega*x*x*x*x*x + 12*x);
+                + 8*omega*x*x*x*x*x);
         break;
     }
+    arg += x*x;
   }
-  return Lap*omega;
+
+  return Lap*omega*exp(-omega*arg/2);
 }
 
 double TrialSlater::LapJas()
@@ -151,7 +158,7 @@ double TrialSlater::LapJas()
     }
     Lap += (term1+2*term2);
   }
-  return Lap*0;
+  return Lap;
 }
 
 double TrialSlater::computeQuantumForce(int p, int d)
