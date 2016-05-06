@@ -122,7 +122,7 @@ double TrialSlater::LapPhi(int pos,int orbital)
     arg += x*x;
   }
 
-  return Lap*omega*exp(-omega*arg/2);
+  return Lap*omega*exp(-omega*arg*0.5);
 }
 
 double TrialSlater::LapJas()
@@ -138,23 +138,27 @@ double TrialSlater::LapJas()
   for (int k=0 ; k<nP ; k++){
     const double xk = my_system->get_particle().at(k)->get_position().at(0);
     const double yk = my_system->get_particle().at(k)->get_position().at(1);
+
     for (int i=k+1 ; i<nP ; i++){
       const double xi = my_system->get_particle().at(i)->get_position().at(0);
       const double yi = my_system->get_particle().at(i)->get_position().at(1);
       const double aki= 1-((k<nP_2)*(i>=nP_2)!=1)*(2.0/3.0);
       const double r_ki = r_ij(k,i);
+
       const double jast_ki = 1/((1+beta*r_ki)*(1+beta*r_ki));
+        
       for(int j=k+1 ; j<nP ; j++){
         const double xj = my_system->get_particle().at(j)->get_position().at(0);
         const double yj = my_system->get_particle().at(j)->get_position().at(1);
         const double akj= 1-((k<nP_2)*(j>=nP_2)!=1)*(2.0/3.0);
         const double r_kj = r_ij(k,j); 
+
         const double jast_kj = 1/((1+beta*r_kj)*(1+beta*r_kj));
         const double rkri_rkrj = (xk-xi)*(xk-xj)+(yk-yi)*(yk-yj);
         term1 += akj*rkri_rkrj*jast_kj/r_kj;
       }
       term1 *= aki*jast_ki/r_ki;
-      term2 += aki*(1+2*beta*r_ki)/(r_ki*(1+beta*r_ki)*(1+beta*r_ki)*(1+beta*r_ki));
+      term2 += aki/(r_ki*(1+beta*r_ki)*(1+beta*r_ki)*(1+beta*r_ki));
     }
     Lap += (term1+2*term2);
   }

@@ -28,7 +28,7 @@ int main (int argc,char* argv[]){
   bool    File            = false;
   const int     nDimensions     = 2;
   //const int     nParticles      = 12;
-  const int 	  nCycles	        = (int) 1e5;
+  const int 	  nCycles	        = (int) 1e4;
   const double  omega		        = 1.0;
   //const double  alpha		        = 0.95455;
   const double  beta		        = 0.50905;
@@ -40,7 +40,7 @@ int main (int argc,char* argv[]){
   std::vector<double> parameters {omega, beta};
   int nParticles = 0;
   int orbitals   = 0;
-  int chosenOne  = 0;
+  int chosenOne  = 3;
   switch (chosenOne)
   {
     case 0:
