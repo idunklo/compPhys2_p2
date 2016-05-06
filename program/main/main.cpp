@@ -24,7 +24,7 @@ int main (int argc,char* argv[]){
   MPI_Comm_size (MPI_COMM_WORLD,&num_procs);
 
   bool    File            = false;
-  int     nDimensions     = 2;
+  int     nDimensions     = 3;
   int     nParticles      = 2;
   int 	  nCycles	        = (int) 1e6;
   double  omega		        = 0.5;
@@ -36,7 +36,7 @@ int main (int argc,char* argv[]){
 
   std::vector<double> parameters {alpha, beta, omega, a};
 
-  int chosenOne = 1;
+  int chosenOne = 0;
 
   double  stepLength = 1.0;
   switch (chosenOne)
