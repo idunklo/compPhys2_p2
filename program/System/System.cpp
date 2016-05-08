@@ -14,6 +14,7 @@ void System::runMetropolis ()
 
   for (int cycle = 0 ; cycle < my_nCycles ; cycle++){
     accepted = metropolis();
+    //accepted = importanceSampling();
     if (cycle > my_equilibrationFraction * my_nCycles)
       my_sampler->sample(accepted);
   }
@@ -21,34 +22,14 @@ void System::runMetropolis ()
   my_sampler->printResults();
 }
 
-void System::runImportanceSampling ()
-{
-  /*
-  unsigned  seed;
-  bool accepted = false;
-  my_sampler  = new Sampler(this,my_File);
-  clock::duR_SDn d = clock::now() - my_start;
-  seed = d.count();
-  my_generator.seed(seed);
-
-  for (int cycle = 0 ; cycle < my_nCycles ; cycle++){
-    accepted = importanceSampling();
-    if (cycle > my_equilibR_SDnFraction * my_nCycles)
-    {
-      my_sampler->sample(accepted);
-    }
-  }
-  my_sampler->printResults();
-  */
-}
 
 bool System::metropolis ()
 {
   int elected   = 0;
   int detSize   = my_nParticles/2;
   int i         = 0;
-  double R_SD   = 0;
   double R_C    = 0.0;
+  double R_SD   = 0;
   double oldX,oldY,randX, randY;
   my_spin = 0;
   Eigen::VectorXd d_inv (detSize);
@@ -112,8 +93,9 @@ bool System::metropolis ()
 
   //R_SD = R_SD_new/R_SD_old;
   R_SD = (R_SD_new*R_SD_new)/(R_SD_old*R_SD_old);
+  //R_SD*= R_SD;
   R_C *= R_C;
-
+  //R_C = 1;
   //cout << R_SD_new*R_SD_new << "/" << R_SD_old*R_SD_old << " = " 
   //  << R_SD << endl;
   //cout << R_C << endl;

@@ -32,34 +32,34 @@ int main (int argc,char* argv[]){
   const double  omega		        = 1.0;
   //const double  alpha		        = 0.95455;
   const double  beta		        = 0.50905;
-  const double  a               = 1.0;
-  const double  equilibration	  = 0.2;
+  //const double  a               = 1.0;
+  const double  equilibration	  = 0.1;
   const double  derivativeStep  = 0.001;
   const double  stepLength      = 2.0;
 
   std::vector<double> parameters {omega, beta};
-  int nParticles = 0;
+  int nParticles = 2;
   int orbitals   = 0;
-  int chosenOne  = 3;
-  switch (chosenOne)
+  double jf      = 1;
+  switch (nParticles)
   {
-    case 0:
-      nParticles = 6;
-      orbitals   = 1;
-      break;
-
-    case 1:
-      nParticles = 12;
-      orbitals   = 2;
-      break;
-
     case 2:
-      nParticles = 20;
-      orbitals   = 3;
-      break;
-    case 3:
-      nParticles = 2;
       orbitals   = 0;
+      jf         = 1.0;
+      break;
+    case 6:
+      orbitals   = 1;
+      jf         = 1.0;
+      break;
+
+    case 12:
+      orbitals   = 2;
+      jf         = 2.0;
+      break;
+
+    case 20:
+      orbitals   = 3;
+      jf         = 3.0;
       break;
   }
 
@@ -74,7 +74,7 @@ int main (int argc,char* argv[]){
   system->set_rank                  (my_rank);
   system->set_procs                 (num_procs);
   system->set_Hamiltonian	          (new HarmonicOscillator  (system));
-  system->set_WaveFunction	        (new TrialSlater (system));
+  system->set_WaveFunction	        (new TrialSlater (system, jf));
   system->set_InitialState	        (new RandomUniform	 (system, nDimensions, nParticles));
 
   system->set_DMatrix();
@@ -82,7 +82,7 @@ int main (int argc,char* argv[]){
   //std::cout << system->get_DMatrix_dn()<< std::endl;
   
   system->runMetropolis		();
-  MPI_Finalize;
+  MPI_Finalize();
   return 0;
 }
 /*

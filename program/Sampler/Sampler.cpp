@@ -63,15 +63,23 @@ void Sampler::printResults ()
     my_oEnergies.close();
   if (my_oPositions.is_open())
     my_oPositions.close();
-
+  int rank = my_system->get_rank();
   //cout << cumulativeAcceptanceRate << endl; 
-  double expectationValue    = cumulativeEnergy/(double)my_stepNumber;
-  double expectationValue2   = cumulativeEnergy2/(double)my_stepNumber;
-  double variance	       = (expectationValue2 - expectationValue * expectationValue)/
-                            (double)my_stepNumber;
-  cout << "Accept Ratio:     " << cumulativeAcceptanceRate/(double)my_stepNumber << endl;
-  cout << "Expect Value:     " << expectationValue<< endl;
-  cout << "Varian Ceeee:     " << variance << endl;
+  for (int p = 0 ; p<my_system->get_procs() ; p++){
+    MPI_Barrier(MPI_COMM_WORLD);
+    if(rank==p){
+      double expectationValue    = cumulativeEnergy/(double)my_stepNumber;
+      double expectationValue2   = cumulativeEnergy2/(double)my_stepNumber;
+      double variance	       = (expectationValue2 - expectationValue * expectationValue)/
+                                (double)my_stepNumber;
+      cout << "==================" << endl;
+      //cout << "Rank:             " << my_system->get_rank() << endl;
+      cout << "Accept Ratio:     " << cumulativeAcceptanceRate/(double)my_stepNumber << endl;
+      cout << "Expect Value:     " << expectationValue<< endl;
+      cout << "Varian Ceeee:     " << variance << endl;
+      cout << endl;
+    }
+  }
   
   //if(my_system->get_rank()==0){
 /*
