@@ -32,17 +32,21 @@ bool System::metropolis ()
   double R_SD   = 0;
   double oldX,oldY,randX, randY;
   my_spin = 0;
+  Eigen::Vector2d old_pos;
   Eigen::VectorXd d_inv (detSize);
   Eigen::VectorXd SD_row_i (detSize);
   Eigen::MatrixXd DMatrix_old_up (detSize,detSize);
   Eigen::MatrixXd DMatrix_old_dn (detSize,detSize);
+  
 
   /* Choosing particle to move and saving old positions */
   std::uniform_int_distribution<int> particle  (0,my_nParticles-1);
   elected = particle(my_generator);
   if(elected<detSize){my_spin=1;}
-  oldX  = my_particles[elected]->get_position()[0];
-  oldY  = my_particles[elected]->get_position()[1];
+  //oldX  = my_particles[elected]->get_position()[0];
+  //oldY  = my_particles[elected]->get_position()[1];
+  old_pos(0) = my_particles(elected,0);
+  old_pos(1) = my_particles(elected,1);
   randX = my_stepLength*(my_uniform(my_generator)-0.5);
   randY = my_stepLength*(my_uniform(my_generator)-0.5);
   
@@ -62,7 +66,9 @@ bool System::metropolis ()
 
   R_C = my_waveFunction->computeJastrow();
   //cout << R_C << "  ";
-  my_particles[elected]->changePosition(randX,randY);
+  //my_particles[elected]->changePosition(randX,randY);
+  my_particles(elected,0) += randX;
+  my_particles(elected,1) += randY;
   update_r_ij(elected);
   //cout << my_waveFunction->computeJastrow() << endl;
   R_C = my_waveFunction->computeJastrow()/R_C;
@@ -75,7 +81,7 @@ bool System::metropolis ()
     for (int state=0;state<=n;state++){
       const double phi = my_waveFunction->Phi(elected,nx,ny);
       //cout << phi <<" ";
-      //R_SD += phi*d_inv(i);
+      R_SD += phi*d_inv(i);
       SD_row_i(i) = phi;
       i++; nx -= 1; ny += 1;
     }
@@ -109,10 +115,13 @@ bool System::metropolis ()
   //cout << my_DMatrix_dn << endl;
   //cout << "inverse\n" << my_DMatrix_dn_inv << endl;
   //cout << endl;
-
+   
+  //cout << my_particles << endl;
   if (RATIO < my_uniform(my_generator)){
     rejects += 1;
-    my_particles.at(elected)->changePosition(-randX,-randY);
+    //my_particles.at(elected)->changePosition(-randX,-randY);
+    my_particles(elected,0) -= randX;
+    my_particles(elected,1) -= randY;
     update_r_ij(elected);
     my_DMatrix_up = DMatrix_old_up;
     my_DMatrix_dn = DMatrix_old_dn;
@@ -138,19 +147,25 @@ bool System::metropolis ()
 }
 void System::update_r_ij (int pos)
 {
-  const double xk = my_particles.at(pos)->get_position().at(0);
-  const double yk = my_particles.at(pos)->get_position().at(1);
+  //const double xk = my_particles.at(pos)->get_position().at(0);
+  //const double yk = my_particles.at(pos)->get_position().at(1);
+  const double xk = my_particles(pos,0);
+  const double yk = my_particles(pos,1);
   for (int i = 0 ; i < pos; i++){
-    const double xi = my_particles.at(i)->get_position().at(0);
-    const double yi = my_particles.at(i)->get_position().at(1);
+    //const double xi = my_particles.at(i)->get_position().at(0);
+    //const double yi = my_particles.at(i)->get_position().at(1);
+    const double xi = my_particles(i,0);
+    const double yi = my_particles(i,1);
     const double sep= sqrt((xk-xi)*(xk-xi) + (yk-yi)*(yk-yi));
     my_r_ij(i,pos) = sep; 
   }
-  for (int j = pos+1; j < my_nParticles ; j++){
-    const double xj = my_particles.at(j)->get_position().at(0);
-    const double yj = my_particles.at(j)->get_position().at(1);
-    const double sep= sqrt((xk-xj)*(xk-xj) + (yk-yj)*(yk-yj));
-    my_r_ij(pos,j) = sep;
+  for (int i = pos+1; i < my_nParticles ; i++){
+    //const double xj = my_particles.at(j)->get_position().at(0);
+    //const double yj = my_particles.at(j)->get_position().at(1);
+    const double xi = my_particles(i,0);
+    const double yi = my_particles(i,1);
+    const double sep= sqrt((xk-xi)*(xk-xi) + (yk-yi)*(yk-yi));
+    my_r_ij(pos,i) = sep;
   }
 }
 void System::update_inverse(Eigen::MatrixXd& matrix_inv, 
@@ -250,6 +265,7 @@ bool System::importanceSampling()
 
 void System::OPTIMIZE()
 {
+  /*
   int maxIters = 1e2;
   int optCycles= 1e4;
   double step  = 0.01;
@@ -309,11 +325,13 @@ void System::OPTIMIZE()
   }
   std::cout << "alpha:  " << my_parameters[0];
   std::cout << "  beta:  " << my_parameters[1] << std::endl;
+  */
 }
 
 
 double System::Hermite_n ( int n, double x)
 {
+  /*
   double Hi = 0.0;
   double Hb = 1.0;
   double Hc = 2*x;
@@ -331,6 +349,7 @@ double System::Hermite_n ( int n, double x)
     }
     return Hi; 
   }
+  */
 }
 
 void System::set_DMatrix()
@@ -366,11 +385,15 @@ void System::set_DMatrix()
   //cout << my_DMatrix_dn << endl;
 
   for (int i = 0 ; i < nP ; i++){
-    const double xi = my_particles.at(i)->get_position().at(0);
-    const double yi = my_particles.at(i)->get_position().at(1);
+    //const double xi = my_particles.at(i)->get_position().at(0);
+    //const double yi = my_particles.at(i)->get_position().at(1);
+    const double xi = my_particles(i,0);
+    const double yi = my_particles(i,1);
     for (int j = i ; j < nP ; j++){
-      const double xj = my_particles.at(j)->get_position().at(0);
-      const double yj = my_particles.at(j)->get_position().at(1);
+      //const double xj = my_particles.at(j)->get_position().at(0);
+      //const double yj = my_particles.at(j)->get_position().at(1);
+      const double xj = my_particles(j,0);
+      const double yj = my_particles(j,1);
       const double sep= sqrt((xi-xj)*(xi-xj) + (yi-yj)*(yi-yj));
       r_ij(i,j) = sep;
     }

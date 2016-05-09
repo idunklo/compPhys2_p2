@@ -8,7 +8,6 @@
 #include "../WaveFunction/WaveFunction.h"
 #include "../InitialState/InitialState.h"
 #include "../Hamiltonian/HarmonicOscillator.h"
-//#include "../WaveFunction/TrialWaveFunction.h"
 #include "../WaveFunction/TrialSlater.h"
 #include "../InitialState/RandomUniform.h"
 
@@ -27,18 +26,15 @@ int main (int argc,char* argv[]){
 
   bool    File            = false;
   const int     nDimensions     = 2;
-  //const int     nParticles      = 12;
   const int 	  nCycles	        = (int) 1e4;
   const double  omega		        = 1.0;
-  //const double  alpha		        = 0.95455;
   const double  beta		        = 0.50905;
-  //const double  a               = 1.0;
   const double  equilibration	  = 0.1;
   const double  derivativeStep  = 0.001;
   const double  stepLength      = 2.0;
 
   std::vector<double> parameters {omega, beta};
-  int nParticles = 2;
+  int nParticles = 6;
   int orbitals   = 0;
   double jf      = 1;
   switch (nParticles)

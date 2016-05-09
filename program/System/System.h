@@ -73,9 +73,11 @@ class System
       { my_timer = timer; }
     void set_parameters		          (std::vector<double> parameters)
       { my_parameters = parameters; }
-    void add_particle (class Particle* particle)
-      { my_particles.push_back(particle); }
+    //void add_particle (class Particle* particle)
+    //  { my_particles.push_back(particle); }
     void set_DMatrix();
+    void set_particles              (Eigen::MatrixXd& particles)
+      { my_particles = particles;}
     
     /* Return functions */
     int	    get_nDimensions		  (){return my_nDimensions;}
@@ -97,12 +99,13 @@ class System
     Eigen::MatrixXd& get_DMatrix_dn     (){return my_DMatrix_dn;}
     Eigen::MatrixXd& get_DMatrix_dn_inv (){return my_DMatrix_dn_inv;}
     Eigen::MatrixXd& get_r_ij           (){return my_r_ij;}
+    Eigen::MatrixXd& get_particles      (){return my_particles;}
 
     class Hamiltonian*    get_hamiltonian   (){return my_hamiltonian;}
     class WaveFunction*		get_waveFunction  (){return my_waveFunction;}
     class Sampler*		    get_sampler       (){return	my_sampler;}
     class Timer*		      get_timer         (){return my_timer;}
-    std::vector<class Particle*>&  get_particle()	{return my_particles;}
+    //std::vector<class Particle*>&  get_particle()	{return my_particles;}
     
   protected:
     //std::ofstream my_oFile;
@@ -127,6 +130,7 @@ class System
     Eigen::MatrixXd my_DMatrix_up_inv;
     Eigen::MatrixXd my_DMatrix_dn_inv;
     Eigen::MatrixXd my_r_ij;
+    Eigen::MatrixXd my_particles;
     std::vector<double> my_parameters	= std::vector<double>();
 
     class Hamiltonian*    my_hamiltonian    = nullptr;
@@ -134,7 +138,7 @@ class System
     class InitialState*	  my_initialState   = nullptr;
     class Sampler*	      my_sampler        = nullptr;
     class Timer*          my_timer          = nullptr;
-    std::vector<class Particle*> my_particles = std::vector<class Particle*>();
+    //std::vector<class Particle*> my_particles = std::vector<class Particle*>();
 
 
     typedef std::chrono::high_resolution_clock clock;

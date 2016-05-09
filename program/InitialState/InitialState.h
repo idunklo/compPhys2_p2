@@ -8,7 +8,7 @@ class InitialState
     
     virtual void setupInitialState () = 0;
 
-    std::vector<class Particle*> get_particles() {return my_particles;}
+    //std::vector<class Particle*> get_particles() {return my_particles;}
     
   protected:
     
@@ -17,5 +17,5 @@ class InitialState
 
     class System* my_system = nullptr;
 
-    std::vector<class Particle*> my_particles;
+    //std::vector<class Particle*> my_particles;
 };

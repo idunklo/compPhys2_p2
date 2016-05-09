@@ -19,7 +19,6 @@ double HarmonicOscillator::HOLap()
   int startPos       = 0;
   int stopPos        = 0;
   int row            = 0;
-  int orbital        = 0;
   double Grads       = 0.0;
   double SD_LAP      = 0.0;
   double SD_LAP_new  = 0.0;
@@ -44,10 +43,8 @@ double HarmonicOscillator::HOLap()
     int nx = shell; int ny = 0;
     for (int state = 0 ; state <= shell ; state++){
       for (int r = startPos; r < stopPos; r++){
-        //for (int part = startPos; part < stopPos ; part++){
-          SD_LAP_new += (my_system->get_waveFunction()->LapPhi(r,nx)
-                       + my_system->get_waveFunction()->LapPhi(r,ny))
-                       * D_inv(row,r-startPos);
+        SD_LAP_new += my_system->get_waveFunction()->LapPhi(r,nx,ny)
+                    *  D_inv(row,r-startPos);
       }
       row++; nx--;ny++;
     }
@@ -79,8 +76,8 @@ double HarmonicOscillator::HOExt()
   const double omega = my_system->get_parameters()[0];
         double r_all = 0.0;
   for (int p = 0 ; p < nP ; p++){
-    const double x = my_system->get_particle().at(p)->get_position().at(0);
-    const double y = my_system->get_particle().at(p)->get_position().at(1);
+    const double x = my_system->get_particles()(p,0);
+    const double y = my_system->get_particles()(p,1);
     r_all += x*x + y*y; 
   }
   return 0.5*omega*omega*r_all;
@@ -93,7 +90,7 @@ double HarmonicOscillator::HRep()
   double rep = 0.0;
   for (int p1 = 0 ; p1 < nP ; p1++){
     for (int p2 = p1+1 ; p2 < nP ; p2++){
-      rep += 1/r_ij(p1,p2);
+      rep += 1.0/r_ij(p1,p2);
     }
   }
   return rep;
