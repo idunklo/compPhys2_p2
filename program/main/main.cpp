@@ -28,34 +28,30 @@ int main (int argc,char* argv[]){
   const int     nDimensions     = 2;
   const int 	  nCycles	        = (int) 1e4;
   const double  omega		        = 1.0;
-  const double  beta		        = 0.50905;
+  const double  beta		        = 0.3;//0.50905;
   const double  equilibration	  = 0.1;
   const double  derivativeStep  = 0.001;
   const double  stepLength      = 2.0;
 
   std::vector<double> parameters {omega, beta};
-  int nParticles = 6;
+  int nParticles = 2;
   int orbitals   = 0;
-  double jf      = 1;
+  double jf      = 0;
   switch (nParticles)
   {
     case 2:
       orbitals   = 0;
-      jf         = 1.0;
       break;
     case 6:
       orbitals   = 1;
-      jf         = 1.0;
       break;
 
     case 12:
       orbitals   = 2;
-      jf         = 2.0;
       break;
 
     case 20:
       orbitals   = 3;
-      jf         = 3.0;
       break;
   }
 
@@ -70,7 +66,7 @@ int main (int argc,char* argv[]){
   system->set_rank                  (my_rank);
   system->set_procs                 (num_procs);
   system->set_Hamiltonian	          (new HarmonicOscillator  (system));
-  system->set_WaveFunction	        (new TrialSlater (system, jf));
+  system->set_WaveFunction	        (new TrialSlater (system));
   system->set_InitialState	        (new RandomUniform	 (system, nDimensions, nParticles));
 
   system->set_DMatrix();

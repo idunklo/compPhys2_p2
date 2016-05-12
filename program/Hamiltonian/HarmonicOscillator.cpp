@@ -37,8 +37,6 @@ double HarmonicOscillator::HOLap()
     stopPos  = nP;
   }
   const double JastrowLap= my_system->get_waveFunction()->LapJas();
-  //cout << "Jas " << JastrowLap << endl;
-  //cout << D_inv << endl;
   for (int shell = 0 ; shell <= orbitals ; shell++){
     int nx = shell; int ny = 0;
     for (int state = 0 ; state <= shell ; state++){
@@ -67,6 +65,7 @@ double HarmonicOscillator::HOLap()
   }
   SD_LAP += SD_LAP_new; 
   //cout << -0.5*SD_LAP << "  " << -0.5*JastrowLap << "  " << -totGrad << endl;
+  cout << totGrad << endl;
   return -0.5*(SD_LAP + JastrowLap + 2*totGrad);
 }
 

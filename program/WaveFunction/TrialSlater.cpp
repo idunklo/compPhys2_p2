@@ -3,25 +3,21 @@
 using std::cout;
 using std::endl;
 
-TrialSlater::TrialSlater (System* system, double jf) :
+TrialSlater::TrialSlater (System* system) :
   WaveFunction(system)
 {
-  my_jf = jf;
 }
 
 
 double TrialSlater::Phi(int p, int nx, int ny)
 {
-  //const double x = my_system->get_particles().at(p)->get_position().at(0);
-  //const double y = my_system->get_particles().at(p)->get_position().at(1);
   const double x = my_system->get_particles()(p,0);
   const double y = my_system->get_particles()(p,1);
-  const double omega = my_system->get_parameters().at(0);
+  const double omega = my_system->get_parameters()[0];
   const double omegasq = sqrt(omega);
   const double Hnx = H(nx,omegasq*x);
   const double Hny = H(ny,omegasq*y);
  
-  //cout << Hnx*Hny*exp(-omega*(x*x+y*y)*0.5)<<endl;
   return Hnx*Hny*exp(-omega*(x*x+y*y)*0.5);
 }
 
@@ -29,7 +25,7 @@ double TrialSlater::computeJastrow ()
 {
   const int nP        = my_system->get_nParticles();
   const int nP_2      = nP/2;
-  const double beta   = my_system->get_parameters().at(1);
+  const double beta   = my_system->get_parameters()[1];
   const Eigen::MatrixXd rij = my_system->get_r_ij();
   double argument     = 0.0;
   for (int i=0 ; i<nP; i++){
@@ -39,27 +35,27 @@ double TrialSlater::computeJastrow ()
       argument += a*sep/(1+beta*sep); 
     }
   }
-  return exp(argument/my_jf);
+  return exp(argument);
 }
 
-double TrialSlater::GradPhi(int pos, int d)
+double TrialSlater::GradPhi(int k, int d)
 {
   const int nP       = my_system->get_nParticles();
-  const double omega = my_system->get_parameters()[0];
   const int orbitals = my_system->get_orbitals();
-  const double xi  = my_system->get_particles()(pos,d);
-  const double yi  = my_system->get_particles()(pos,(d==0));
-  const double e   = exp(-omega*(xi*xi+yi*yi)*0.5);
-  const double de  = -omega*xi;
-  const double x   = sqrt(omega)*xi;
-  const double y   = sqrt(omega)*yi;
+  const double omega = my_system->get_parameters()[0];
+  const double xi    = my_system->get_particles()(k,d);
+  const double yi    = my_system->get_particles()(k,(d==0));
+  const double e     = exp(-omega*(xi*xi+yi*yi)*0.5);
+  const double de    = -omega*xi;
+  const double x     = sqrt(omega)*xi;
+  const double y     = sqrt(omega)*yi;
   int col     = 0;
   double Grad = 0.0;
   Eigen::VectorXd d_inv(nP);
-  if(pos<nP/2)
-    d_inv = my_system->get_DMatrix_up_inv().col(pos);
+  if(k<nP/2)
+    d_inv = my_system->get_DMatrix_up_inv().col(k);
   else
-    d_inv = my_system->get_DMatrix_dn_inv().col(pos-nP/2);
+    d_inv = my_system->get_DMatrix_dn_inv().col(k-nP/2);
 
   for (int shell = 0 ; shell <= orbitals ; shell++){
     int nx = shell; int ny = 0;
@@ -77,7 +73,7 @@ double TrialSlater::GradJas(int k, int d)
 {
   const int nP         = my_system->get_nParticles();
   const int nP_2       = nP/2;
-  const double beta    = my_system->get_parameters().at(1);
+  const double beta    = my_system->get_parameters()[1];
   const Eigen::MatrixXd r_ij = my_system->get_r_ij();
   const double xk = my_system->get_particles()(k,d);
   double Grad = 0.0;
@@ -85,7 +81,7 @@ double TrialSlater::GradJas(int k, int d)
   for (int j = 0 ; j < k ; j++){
     const double a   = 1-((k<nP_2)*(j>=nP_2)!=1)*(2.0/3.0);
     const double xj = my_system->get_particles()(j,d);
-    const double onePbetarkj = (1 + beta*r_ij(k,j));
+    const double onePbetarkj = (1 + beta*r_ij(j,k));
 
     Grad += a*(xk-xj)/(r_ij(j,k)*onePbetarkj*onePbetarkj);
   }
@@ -96,7 +92,7 @@ double TrialSlater::GradJas(int k, int d)
 
     Grad += a*(xk-xj)/(r_ij(k,j)*onePbetarkj*onePbetarkj);
   }
-  return Grad/(my_jf*my_jf);
+  return Grad;
 }
 
 double TrialSlater::LapPhi(int pos,int nx, int ny)
@@ -124,7 +120,6 @@ double TrialSlater::LapJas()
   const int nP         = my_system->get_nParticles();
   const int nP_2       = nP/2;
   const double beta    = my_system->get_parameters()[1];
-  const double jfbeta  = my_jf*beta;
   const Eigen::MatrixXd r_ij = my_system->get_r_ij();
   double Lap  = 0.0;
 
@@ -139,7 +134,7 @@ double TrialSlater::LapJas()
       const double yi = my_system->get_particles()(i,1);
       const double aki= 1-((k<nP_2)*(i>=nP_2)!=1)*(2.0/3.0);
       const double r_ki = r_ij(k,i);
-      const double bri  = my_jf+jfbeta*r_ki;
+      const double bri  = 1+beta*r_ki;
 
       const double jast_ki = aki/(r_ki*bri*bri);
         
@@ -148,7 +143,7 @@ double TrialSlater::LapJas()
         const double yj = my_system->get_particles()(j,1);
         const double akj= 1-((k<nP_2)*(j>=nP_2)!=1)*(2.0/3.0);
         const double r_kj = r_ij(k,j); 
-        const double brj  = my_jf+jfbeta*r_kj;
+        const double brj  = 1+beta*r_kj;
 
         const double jast_kj = akj/(r_kj*brj*brj);
         const double rkri_rkrj = (xk-xi)*(xk-xj)+(yk-yi)*(yk-yj);

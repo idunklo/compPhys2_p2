@@ -18,9 +18,9 @@ class Timer
     class System* my_system = nullptr;
 
     typedef std::chrono::high_resolution_clock	clock;
-    typedef std::chrono::seconds		seconds_type;
-    typedef std::chrono::milliseconds		milli_type;
-    typedef std::chrono::microseconds		micro_type;
+    typedef std::chrono::seconds        seconds_type;
+    typedef std::chrono::milliseconds   milli_type;
+    typedef std::chrono::microseconds   micro_type;
 
     std::chrono::duration<int> seconds;
     std::chrono::duration<int> milli;
