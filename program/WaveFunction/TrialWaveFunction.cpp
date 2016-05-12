@@ -41,7 +41,7 @@ double TrialWaveFunction::evaluate ()
   argument1 = argument1*(-0.5*alpha*omega);
   argument2 *= a;
 
-  return exp(argument1 + argument2);
+  return exp(argument1);// + argument2);
 }
 
 double TrialWaveFunction::computeGradient(int p, int d)

@@ -40,7 +40,7 @@ double HarmonicOscillator::computeNumLocalEnergy ()
   HOLap = -0.5*ddPsi/waveFuncNow;
   HOExt = 0.5*HOExt*omega2;
 
-  return HOLap + HOExt + Hrep;
+  return HOLap + HOExt;// + Hrep;
 }
 
 double HarmonicOscillator::computeAnaLocalEnergy()
@@ -77,6 +77,6 @@ double HarmonicOscillator::computeAnaLocalEnergy()
 
   HOLap = -0.5*HOLap;
   HOExt = 0.5*omega*omega*(r2);
-  Hrep  = 1/r12;
+  Hrep  = 0;//1/r12;
   return (HOLap + HOExt + Hrep);
 }

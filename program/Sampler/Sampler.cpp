@@ -25,8 +25,8 @@ void Sampler::sample (bool accepted)
     cumulativeAcceptanceRate  = 0;
   }
 
-  double localEnergy = my_system->get_hamiltonian()->computeNumLocalEnergy();
-  //double localEnergy = my_system->get_hamiltonian()->computeAnaLocalEnergy();
+  //double localEnergy = my_system->get_hamiltonian()->computeNumLocalEnergy();
+  double localEnergy = my_system->get_hamiltonian()->computeAnaLocalEnergy();
 
   if (my_oEnergies.is_open())
   {

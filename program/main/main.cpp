@@ -24,19 +24,19 @@ int main (int argc,char* argv[]){
   MPI_Comm_size (MPI_COMM_WORLD,&num_procs);
 
   bool    File            = false;
-  int     nDimensions     = 3;
+  int     nDimensions     = 2;
   int     nParticles      = 2;
   int 	  nCycles	        = (int) 1e6;
-  double  omega		        = 0.5;
-  double  alpha		        = 0.95455;
-  double  beta		        = 0.50905;
+  double  omega		        = 1.0;//0.5;
+  double  alpha		        = 1.0;//0.95455;
+  double  beta		        = 0.3;//0.50905;
   double  a               = 1.0;
   double  equilibration	  = 0.1;
   double  derivativeStep  = 0.001;
 
   std::vector<double> parameters {alpha, beta, omega, a};
 
-  int chosenOne = 0;
+  int chosenOne = 1;
 
   double  stepLength = 1.0;
   switch (chosenOne)
@@ -49,7 +49,7 @@ int main (int argc,char* argv[]){
           parameters);
       break;
     case 1:
-      stepLength = 5.7;
+      stepLength = 2.0;
       metropolis(File,nCycles,nParticles,nDimensions,
           my_rank, num_procs,
           stepLength,equilibration,derivativeStep,
