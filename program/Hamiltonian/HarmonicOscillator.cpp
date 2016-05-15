@@ -15,11 +15,9 @@ double HarmonicOscillator::HOLap()
   const int orbitals = my_system->get_orbitals();
   const int spin     = my_system->get_spin();
   const int nP       = my_system->get_nParticles();
-  const int nD       = my_system->get_nDimensions();
   int startPos       = 0;
   int stopPos        = 0;
   int row            = 0;
-  double Grads       = 0.0;
   double SD_LAP      = 0.0;
   double SD_LAP_new  = 0.0;
   Eigen::MatrixXd D_inv(nP/2,nP/2);;
@@ -64,8 +62,7 @@ double HarmonicOscillator::HOLap()
     my_system->set_SDLap_dn(SD_LAP_new);
   }
   SD_LAP += SD_LAP_new; 
-  //cout << -0.5*SD_LAP << "  " << -0.5*JastrowLap << "  " << -totGrad << endl;
-  cout << totGrad << endl;
+  //cout << SD_LAP << "  " << JastrowLap << "  " << 2*totGrad << endl;
   return -0.5*(SD_LAP + JastrowLap + 2*totGrad);
 }
 

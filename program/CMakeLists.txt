@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-set(GCC_COMPILE_FLAGS "--std=c++11")
+set(GCC_COMPILE_FLAGS "--std=c++11 -Wall")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COMPILE_FLAGS}")
 
 project("compPhys2_proj2")

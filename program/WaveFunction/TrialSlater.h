@@ -14,7 +14,9 @@ class TrialSlater: public WaveFunction
     double H                      (int state, double x);
     double dH                     (int state, double x);
     double ddH                    (int state, double x);
-    double computeQuantumForce    (int p, int d);
+    double dPhi_alpha             (int p, int nx, int ny);
+    double dlnjast_beta           ();
+    Eigen::Vector2d computeQuantumForce    (int p, int d);
     void   computePsiBars         (double &psiBar_alpha, double &psiBar_beta);
   protected:
 };

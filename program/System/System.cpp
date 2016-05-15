@@ -13,8 +13,8 @@ void System::runMetropolis ()
   my_generator.seed(seed);
 
   for (int cycle = 0 ; cycle < my_nCycles ; cycle++){
-    accepted = metropolis();
-    //accepted = importanceSampling();
+    //accepted = metropolis();
+    accepted = importanceSampling();
     if (cycle > my_equilibrationFraction * my_nCycles)
       my_sampler->sample(accepted);
   }
@@ -24,7 +24,6 @@ void System::runMetropolis ()
 
 bool System::metropolis ()
 {
-  int elected   = 0;
   int detSize   = my_nParticles/2;
   int i         = 0;
   double R_C    = 0.0;
@@ -40,17 +39,17 @@ bool System::metropolis ()
 
   /* Choosing particle to move and saving old positions */
   std::uniform_int_distribution<int> particle  (0,my_nParticles-1);
-  elected = particle(my_generator);
-  if(elected<detSize){my_spin=1;}
-  old_pos = my_particles.row(elected);
+  my_elected = particle(my_generator);
+  if(my_elected<detSize){my_spin=1;}
+  old_pos = my_particles.row(my_elected);
   randX = my_stepLength*(my_uniform(my_generator)-0.5);
   randY = my_stepLength*(my_uniform(my_generator)-0.5);
   
   /* Getting column from inverse SD */
   if (my_spin)
-    d_inv = my_DMatrix_up_inv.col(elected);
+    d_inv = my_DMatrix_up_inv.col(my_elected);
   else
-    d_inv = my_DMatrix_dn_inv.col(elected-detSize);
+    d_inv = my_DMatrix_dn_inv.col(my_elected-detSize);
   /* Calculating correlation ratio */
   DMatrix_old_up = my_DMatrix_up;
   DMatrix_old_dn = my_DMatrix_dn;
@@ -58,25 +57,25 @@ bool System::metropolis ()
   //                 my_DMatrix_dn.determinant();
 
   R_C = my_waveFunction->computeJastrow();
-  my_particles(elected,0) += randX;
-  my_particles(elected,1) += randY;
-  update_r_ij(elected);
+  my_particles(my_elected,0) += randX;
+  my_particles(my_elected,1) += randY;
+  update_r_ij(my_elected);
   R_C = my_waveFunction->computeJastrow()/R_C;
 
   /* Calculating new row for SD */
   for (int n=0;n<=my_orbitals;n++){
     int nx = n; int ny = 0;
     for (int state=0;state<=n;state++){
-      const double phi = my_waveFunction->Phi(elected,nx,ny);
+      const double phi = my_waveFunction->Phi(my_elected,nx,ny);
       R_SD += phi*d_inv(i);
       SD_row_i(i) = phi;
       i++; nx--; ny++;
     }
   }
-  if(my_spin)
-    my_DMatrix_up.row(elected) = SD_row_i;
-  else
-    my_DMatrix_dn.row(elected-detSize) = SD_row_i;
+  //if(my_spin)
+  //  my_DMatrix_up.row(my_elected) = SD_row_i;
+  //else
+  //  my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
   
 
   //double R_SD_new = my_DMatrix_up.determinant()*
@@ -90,28 +89,32 @@ bool System::metropolis ()
 
   if (RATIO < my_uniform(my_generator)){
     rejects += 1;
-    my_particles(elected,0) -= randX;
-    my_particles(elected,1) -= randY;
-    update_r_ij(elected);
-    my_DMatrix_up = DMatrix_old_up;
-    my_DMatrix_dn = DMatrix_old_dn;
+    my_particles(my_elected,0) -= randX;
+    my_particles(my_elected,1) -= randY;
+    update_r_ij(my_elected);
+    //my_DMatrix_up = DMatrix_old_up;
+    //my_DMatrix_dn = DMatrix_old_dn;
     return false;
   }
   else{
     /* Updating SD matrices after accepting new step */
     //if(my_spin){
     //  update_inverse(my_DMatrix_up_inv,my_DMatrix_up,
-    //                 SD_row_i, elected, RATIO);
-    //  my_DMatrix_up.row(elected) = SD_row_i;
+    //                 SD_row_i, my_elected, R_SD);
+    //  my_DMatrix_up.row(my_elected) = SD_row_i;
     //}
     //else{
     //  update_inverse(my_DMatrix_dn_inv,my_DMatrix_dn,
-    //                 SD_row_i, elected-detSize, RATIO);
-    //  my_DMatrix_dn.row(elected-detSize) = SD_row_i;
+    //                 SD_row_i, my_elected-detSize, R_SD);
+    //  my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
     //}
     //cout << my_DMatrix_up_inv << endl;
     my_DMatrix_up_inv = my_DMatrix_up.inverse();
     my_DMatrix_dn_inv = my_DMatrix_dn.inverse();
+    if(my_spin)
+      my_DMatrix_up.row(my_elected) = SD_row_i;
+    else
+      my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
     return true;
   }
 }
@@ -140,175 +143,188 @@ void System::update_inverse(Eigen::MatrixXd& matrix_inv,
   const int detSize    = my_nParticles/2;
   const Eigen::MatrixXd old_matrix_inv = matrix_inv;
   double element = 0.0;
+  double tempTerm= 0.0;
   for (int k=0; k<detSize ; k++){
     const double factor = old_matrix_inv(k,i)/RATIO;
 
     for (int j=0 ; j<detSize ; j++){
-      element = 0.0;
+      element = factor;
       if (i != j){
-        element = old_matrix_inv(k,j);
+        tempTerm = 0.0;
+        for (int l=0 ; l<detSize ; l++)
+          tempTerm += new_row(l)*old_matrix_inv(l,j);
 
-        for (int l=0 ; l<detSize ; l++){
-          element -= factor*new_row(l)*old_matrix_inv(l,j);
-        }
+        element = old_matrix_inv(k,j) - element*tempTerm;
       }
-      else
-        element = factor;
-        //element += matrix(i,l)*old_matrix_inv(l,j);
       matrix_inv(k,j) = element;
-      }
+      //cout << "mai " <<matrix_inv << "\nhh\n" << "old " <<old_matrix_inv << endl;
     }
-  
+  }
+  //cout << endl;
 }
 
 bool System::importanceSampling()
 {
-  /*
-  int     elected           = 0;
-  int     chosenDimension          = 0;
-  double    stepDifference         = 0;
-  double    randomMove             = 0;
-  double    oldPosition            = 0;
-  double    greensExp              = 0;
-  double    waveFunctionOld        = 0;
-  double    waveFunctionNew        = 0;
-  double    quantumForceOld        = 0;
-  double    quantumForceNew        = 0;
-  double    waveFunctionsCompared  = 0;
-  double    greensFunctionCompared = 0;
-  double    compared               = 0;
+  
+  int     i                 = 0;
+  int     detSize           = my_nParticles/2;
+  double    greensArg       = 0;
+  double    R_C             = 0;
+  double    R_SD            = 0;
+  Eigen::Vector2d RandMove;
+  Eigen::Vector2d OldPos;
+  Eigen::Vector2d QforceX;
+  Eigen::Vector2d QforceY;
+  Eigen::Vector2d QforceOld;
+  Eigen::Vector2d QforceNew;
+  Eigen::Vector2d StepDiff;
+  Eigen::VectorXd d_inv (detSize);
+  Eigen::VectorXd SD_row_i (detSize);
 
   std::uniform_int_distribution<int> particle (0,my_nParticles-1);
-  std::uniform_int_distribution<int> dimension  (0,my_nDimensions-1);
+  std::normal_distribution<double>   my_normal (0,sqrt(my_stepLength));
 
-  elected  = particle(my_generator);
-  chosenDimension = dimension(my_generator);
+  my_elected = particle(my_generator);
+  my_spin = 0;
+  if(my_elected<detSize){my_spin=1;}
 
-  oldPosition = my_particles[elected]->get_position()[chosenDimension];
+  OldPos = my_particles.row(my_elected);
 
-  waveFunctionOld = my_waveFunction->evaluate();
+  if (my_spin)
+    d_inv = my_DMatrix_up_inv.col(my_elected);
+  else
+    d_inv = my_DMatrix_dn_inv.col(my_elected-detSize);
+  
+  
+  QforceX = my_waveFunction->computeQuantumForce(my_elected,0); 
+  QforceY = my_waveFunction->computeQuantumForce(my_elected,1); 
+  QforceOld << QforceX(0)+QforceX(1), QforceY(0)+QforceY(1);
+  
+  RandMove << (my_normal(my_generator) + 0.5*my_stepLength*QforceOld(0)),
+              (my_normal(my_generator) + 0.5*my_stepLength*QforceOld(1));
 
-  quantumForceOld = my_waveFunction->
-           computeQuantumForce(elected, chosenDimension);
+  R_C = my_waveFunction->computeJastrow();
 
-  randomMove  = (my_normal(my_generator)) * sqrt(my_stepLength)
-              +
-              quantumForceOld * my_stepLength * 0.5;
+  my_particles.row(my_elected) += RandMove;
+  update_r_ij(my_elected); 
+  R_C = my_waveFunction->computeJastrow()/R_C;
+  for (int n=0;n<=my_orbitals;n++){
+    int nx = n; int ny = 0;
+    for (int state=0;state<=n;state++){
+      const double phi = my_waveFunction->Phi(my_elected,nx,ny);
+      R_SD += phi*d_inv(i);
+      SD_row_i(i) = phi;
+      i++; nx--; ny++;
+    }
+  }
+  //QforceNew << my_waveFunction->computeQuantumForce(my_elected, 0),
+  //             my_waveFunction->computeQuantumForce(my_elected, 1);
+  QforceX = my_waveFunction->computeQuantumForce(my_elected,0); 
+  QforceY = my_waveFunction->computeQuantumForce(my_elected,1); 
+  QforceNew << QforceX(0)/(R_SD) + QforceX(1),
+               QforceY(0)/(R_SD) + QforceY(1);
 
-  my_particles[elected]->changePosition(chosenDimension, randomMove);
+  StepDiff << OldPos(0) - my_particles.row(my_elected)(0),
+              OldPos(1) - my_particles.row(my_elected)(1);
 
-  waveFunctionNew = my_waveFunction->evaluate();
-
-  quantumForceNew = my_waveFunction->
-        computeQuantumForce(elected, chosenDimension);
-
-  stepDifference  = my_particles[elected]->get_position()[chosenDimension] - oldPosition;
-
-  greensExp  = (0.5*(quantumForceOld + quantumForceNew)*((quantumForceOld - quantumForceNew)*
-    0.25*my_stepLength - stepDifference));
-
-  greensFunctionCompared = exp(greensExp);
-
-  waveFunctionsCompared  = (waveFunctionNew*waveFunctionNew)/
-         (waveFunctionOld*waveFunctionOld);
-
-  compared = greensFunctionCompared * waveFunctionsCompared;
+  greensArg  = ((QforceOld+QforceNew).dot
+               (StepDiff + (QforceOld-QforceNew)*0.25*my_stepLength))*0.5;
+  
+  const double compared = exp(greensArg) * R_SD*R_SD * R_C*R_C;
 
   if (compared < my_uniform(my_generator)){
-    my_particles[elected]->get_position()[chosenDimension] = oldPosition;
+    my_particles.row(my_elected) -= RandMove;
+    update_r_ij(my_elected);
     return false;
   }
-  return true;
-  */
+  else{
+    //if(my_spin){
+    //  update_inverse(my_DMatrix_up_inv,my_DMatrix_up,
+    //                 SD_row_i, my_elected, R_SD);
+    //  my_DMatrix_up.row(my_elected) = SD_row_i;
+    //}
+    //else{
+    //  update_inverse(my_DMatrix_dn_inv,my_DMatrix_dn,
+    //                 SD_row_i, my_elected-detSize, R_SD);
+    //  my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
+    //}
+    //cout << my_DMatrix_up_inv << endl;
+    my_DMatrix_up_inv = my_DMatrix_up.inverse();
+    my_DMatrix_dn_inv = my_DMatrix_dn.inverse();
+    if(my_spin)
+      my_DMatrix_up.row(my_elected) = SD_row_i;
+    else
+      my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
+    return true;
+  }
+  
 }
 
 void System::OPTIMIZE()
 {
-  /*
-  int maxIters = 1e2;
-  int optCycles= 1e4;
+  
+  int maxIters = 20;
+  int optCycles= 1e5;
+  int nP_2     = my_nParticles/2;
   double step  = 0.01;
   for (int i = 0 ; i < maxIters ; i++){
-    double Ebar_alpha       = 0;
-    double Ebar_beta        = 0;
-    double psiBar_alpha     = 0;
-    double psiBar_beta      = 0;
-    double cumElocal	      = 0;
-    double cumEPsi_alpha    = 0;
-    double cumEPsi_beta     = 0;
-    double cumPsiBar_alpha  = 0;
-    double cumPsiBar_beta   = 0;
-    my_particles.clear();
-    my_initialState->setupInitialState(); 
-    //std::vector <double> temp1 = {1,1};
-    //std::vector <double> temp2 = {2,2};
-    //my_particles[0]->set_position(temp1);
-    //my_particles[1]->set_position(temp2);
+    double Ebar_alpha     = 0;
+    double Ebar_beta      = 0;
+    double dSD_alpha      = 0;
+    double dJas_beta      = 0;
+    double cumElocal	    = 0;
+    double cumEdSD_alpha  = 0;
+    double cumEdJas_beta  = 0;
+    double cumdSD_alpha   = 0;
+    double cumdJas_beta   = 0;
 
-    //for (int p = 0 ; p < my_nParticles ; p++){
-    //  for (int d = 0 ; d<my_nDimensions ; d++)
-    //    std::cout << my_particles[p]->get_position()[d] << " ";
-    //  std::cout << std::endl; 
-    //}
+    Eigen::VectorXd d_inv (nP_2);
+    my_initialState->setupInitialState(); 
+    set_DMatrix();
+
     for (int i = 0 ; i < optCycles ; i++){
-      psiBar_alpha     = 0;
-      psiBar_beta      = 0;
-      if (metropolis()){
-        my_waveFunction->computePsiBars(psiBar_alpha,psiBar_beta);
-        
+      dSD_alpha = 0;
+      dJas_beta = 0;
+      int row   = 0;
+      if (importanceSampling()){
         double localEnergy = get_hamiltonian()->computeLocalEnergy();
-        cumElocal       += localEnergy;
-        cumEPsi_alpha   += localEnergy*psiBar_alpha;
-        cumEPsi_beta    += localEnergy*psiBar_beta;
-        cumPsiBar_alpha += psiBar_alpha;
-        cumPsiBar_beta  += psiBar_beta;
-        //std::cout << psiBar_alpha << "  " << psiBar_beta << 
-        //  "  " << localEnergy << "  " << localEnergy*psiBar_alpha <<
-        //  "  " << localEnergy*psiBar_beta << std::endl; 
+        for (int p=0 ; p<nP_2 ; p++){
+          row = 0;
+          for (int n=0;n<=my_orbitals;n++){
+            int nx = n; int ny = 0;
+            for (int state=0;state<=n;state++){
+              const double phi_up = my_waveFunction->dPhi_alpha(p,nx,ny);
+              const double phi_dn = my_waveFunction->dPhi_alpha(my_nParticles-p-1,nx,ny);
+              dSD_alpha += phi_up*my_DMatrix_up_inv(row,p)+
+                           phi_dn*my_DMatrix_dn_inv(row,nP_2-p-1);
+              row++; nx--; ny++;
+            }
+          }
+        }
+        dJas_beta = my_waveFunction->dlnjast_beta ();
+        cumElocal     += localEnergy;
+        cumEdSD_alpha += localEnergy*dSD_alpha;
+        cumEdJas_beta += localEnergy*dJas_beta;
+        cumdSD_alpha  += dSD_alpha;
+        cumdJas_beta  += dJas_beta;
       }
     }
-    //std::cout << "(" << cumEPsi_alpha << " - " << cumPsiBar_alpha*cumElocal/optCycles;
-    //std::cout << ")/ " << optCycles << std::endl; 
-    Ebar_alpha = 2*(cumEPsi_alpha - cumPsiBar_alpha*cumElocal/(double)optCycles)
+    Ebar_alpha = 2*(cumEdSD_alpha - cumdSD_alpha*cumElocal/(double)optCycles)
                    /(double)optCycles;
 
-    Ebar_beta  = 2*(cumEPsi_beta - cumPsiBar_beta*cumElocal/(double)optCycles)
+    Ebar_beta  = 2*(cumEdJas_beta - cumdJas_beta*cumElocal/(double)optCycles)
                    /(double)optCycles;
-    if (abs(Ebar_alpha) > 1e-10){
-      my_parameters[0] = my_parameters[0] - step*Ebar_alpha;
-      std::cout<<Ebar_alpha << " | ";}
-    if (abs(Ebar_beta) > 1e-10){
+    if (fabs(Ebar_alpha) > 1e-4){
+      my_parameters[2] = my_parameters[2] - step*Ebar_alpha;
+      cout<<Ebar_alpha << " | ";}
+    if (fabs(Ebar_beta) > 1e-4){
       my_parameters[1] = my_parameters[1] - step*Ebar_beta;
-      std::cout << Ebar_beta;}
-    std::cout << std::endl;
+      cout << Ebar_beta;}
+    cout << endl;
   }
-  std::cout << "alpha:  " << my_parameters[0];
+  std::cout << "alpha:  " << my_parameters[2];
   std::cout << "  beta:  " << my_parameters[1] << std::endl;
-  */
-}
-
-
-double System::Hermite_n ( int n, double x)
-{
-  /*
-  double Hi = 0.0;
-  double Hb = 1.0;
-  double Hc = 2*x;
-  if (n==0)
-    return Hb;
-  else if (n == 1)
-    return Hc; 
-  else
-  {
-    for (int i = 2 ; i <= n ; i++)
-    {
-      Hi = 2*x*Hc - 2*(i-1)*Hb;
-      Hb = Hc;
-      Hc = Hi;
-    }
-    return Hi; 
-  }
-  */
+  
 }
 
 void System::set_DMatrix()

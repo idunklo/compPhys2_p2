@@ -29,16 +29,15 @@ class System
     //  delete my_sampler;
     // }
 
-    bool   metropolis		              ();
-    bool   importanceSampling	        ();
-    void   runMetropolis		          ();
-    void   OPTIMIZE                   ();
-    double Hermite_n                  (int n, double x);
-    void   update_r_ij                (int pos);
-    void   update_inverse             (Eigen::MatrixXd& matrix_inv,
-                                       Eigen::MatrixXd& matrix,
-                                       Eigen::VectorXd& new_row,
-                                       int i, double R_SD);
+    bool   metropolis		      ();
+    bool   importanceSampling	();
+    void   runMetropolis		  ();
+    void   OPTIMIZE           ();
+    void   update_r_ij        (int pos);
+    void   update_inverse     (Eigen::MatrixXd& matrix_inv,
+                               Eigen::MatrixXd& matrix,
+                               Eigen::VectorXd& new_row,
+                               int i, double R_SD);
 
     /* Set functions */
     void set_nDimensions	          (int nDimensions)
@@ -54,7 +53,8 @@ class System
     void set_procs                  (int procs)
       { num_procs = procs; }
     void set_stepLength		          (double stepLength)
-      { my_stepLength = stepLength; }
+      { my_stepLength = stepLength;}
+        //norm_dist my_normal(0,sqrt(stepLength));}
     void set_derivativeStep	        (double h)
       { my_derivativeStep = h; my_derivativeStep2 = h*h;}
     void set_equilibrationFraction  (double equilibraFraction)
@@ -113,6 +113,7 @@ class System
     int    rejects                  = 0;
     int    my_rank                  = 0;
     int    num_procs                = 1;
+    int    my_elected               = 0;
     int    my_orbitals              = 0;
     int    my_nDimensions           = 0;
     int    my_nParticles            = 0;
@@ -144,7 +145,7 @@ class System
     typedef std::chrono::high_resolution_clock clock;
     clock::time_point my_start = clock::now();
     std::uniform_real_distribution<double> my_uniform {std::uniform_real_distribution<double>(0.0,1.0)};
-    std::normal_distribution<double> my_normal {std::normal_distribution<double>(0,1.0/sqrt(2))};
+    //std::normal_distribution<double> my_normal {std::normal_distribution<double>(0,1.0/sqrt(2))};
     std::mt19937 my_generator;
 };
 

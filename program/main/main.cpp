@@ -26,17 +26,17 @@ int main (int argc,char* argv[]){
 
   bool    File            = false;
   const int     nDimensions     = 2;
-  const int 	  nCycles	        = (int) 1e4;
+  const int 	  nCycles	        = (int) 1e5;
   const double  omega		        = 1.0;
-  const double  beta		        = 0.3;//0.50905;
+  const double  alpha           = 1.0;
+  const double  beta		        = 0.5;//0.50905;
   const double  equilibration	  = 0.1;
   const double  derivativeStep  = 0.001;
-  const double  stepLength      = 2.0;
+  const double  stepLength      = 0.005;
 
-  std::vector<double> parameters {omega, beta};
+  std::vector<double> parameters {omega, beta, alpha};
   int nParticles = 2;
   int orbitals   = 0;
-  double jf      = 0;
   switch (nParticles)
   {
     case 2:
@@ -70,8 +70,7 @@ int main (int argc,char* argv[]){
   system->set_InitialState	        (new RandomUniform	 (system, nDimensions, nParticles));
 
   system->set_DMatrix();
-  //std::cout << system->get_DMatrix_up()<< std::endl;
-  //std::cout << system->get_DMatrix_dn()<< std::endl;
+  //system->OPTIMIZE();
   
   system->runMetropolis		();
   MPI_Finalize();

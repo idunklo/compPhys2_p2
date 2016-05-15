@@ -27,6 +27,7 @@ double WaveFunction::computeDoubleDerivative(int p, int d, double waveFunctionCu
   doubleDerivative = doubleDerivative/my_system->get_derivativeStep2();
   return doubleDerivative;
   */
+  return 0.0;
 }
 
 double WaveFunction::computeDerivative(int p, int d, double waveFunctionCurrent)
@@ -45,5 +46,6 @@ double WaveFunction::computeDerivative(int p, int d, double waveFunctionCurrent)
 
   return derivative;
   */
+  return 0.0;
 }
 

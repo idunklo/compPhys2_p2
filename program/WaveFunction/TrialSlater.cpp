@@ -14,11 +14,12 @@ double TrialSlater::Phi(int p, int nx, int ny)
   const double x = my_system->get_particles()(p,0);
   const double y = my_system->get_particles()(p,1);
   const double omega = my_system->get_parameters()[0];
-  const double omegasq = sqrt(omega);
+  const double alpha = my_system->get_parameters()[2];
+  const double omegasq = sqrt(omega*alpha);
   const double Hnx = H(nx,omegasq*x);
   const double Hny = H(ny,omegasq*y);
  
-  return Hnx*Hny*exp(-omega*(x*x+y*y)*0.5);
+  return Hnx*Hny*exp(-omega*alpha*(x*x+y*y)*0.5);
 }
 
 double TrialSlater::computeJastrow ()
@@ -43,12 +44,13 @@ double TrialSlater::GradPhi(int k, int d)
   const int nP       = my_system->get_nParticles();
   const int orbitals = my_system->get_orbitals();
   const double omega = my_system->get_parameters()[0];
+  const double alpha = my_system->get_parameters()[2];
   const double xi    = my_system->get_particles()(k,d);
   const double yi    = my_system->get_particles()(k,(d==0));
-  const double e     = exp(-omega*(xi*xi+yi*yi)*0.5);
-  const double de    = -omega*xi;
-  const double x     = sqrt(omega)*xi;
-  const double y     = sqrt(omega)*yi;
+  const double e     = exp(-omega*alpha*(xi*xi+yi*yi)*0.5);
+  const double de    = -omega*alpha*xi;
+  const double x     = sqrt(omega*alpha)*xi;
+  const double y     = sqrt(omega*alpha)*yi;
   int col     = 0;
   double Grad = 0.0;
   Eigen::VectorXd d_inv(nP);
@@ -99,14 +101,16 @@ double TrialSlater::LapPhi(int pos,int nx, int ny)
 {
   double Lap = 0.0;
   const double omega = my_system->get_parameters()[0];
+  const double alpha = my_system->get_parameters()[2];
+  const double alom  = alpha*omega;
   const double xi  = my_system->get_particles()(pos,0);
   const double yi  = my_system->get_particles()(pos,1);
-  const double e   = exp(-omega*(xi*xi+yi*yi)*0.5);
-  const double dex = -omega*xi;
-  const double dey = -omega*yi;
-  const double dde = omega*omega*(xi*xi+yi*yi)-2*omega;
-  const double x = sqrt(omega)*xi;
-  const double y = sqrt(omega)*yi;
+  const double e   = exp(-alom*(xi*xi+yi*yi)*0.5);
+  const double dex = -alom*xi;
+  const double dey = -alom*yi;
+  const double dde = alom*alom*(xi*xi+yi*yi)-2*alom;
+  const double x = sqrt(alom)*xi;
+  const double y = sqrt(alom)*yi;
 
   Lap = ddH(nx,x)*H(ny,y) + ddH(ny,y)*H(nx,x) + H(ny,y)*H(nx,x)*dde
         + 2*(dH(nx,x)*H(ny,y)*dex + dH(ny,y)*H(nx,x)*dey);
@@ -151,9 +155,9 @@ double TrialSlater::LapJas()
         term1 += rkri_rkrj*jast_kj;
       }
       term1 *= jast_ki;
-      term2 += aki/(r_ki*bri*bri*bri);
+      term2 += aki*(1-beta*r_ki)/(r_ki*bri*bri*bri);
     }
-    Lap += (term1+2*term2);
+    Lap += (term1+term2);
   }
   return Lap;
 }
@@ -178,6 +182,7 @@ double TrialSlater::H(int state, double x)
       return 8*x*x*x - 12*x;
       break;
   }
+  return 0.0;
 }
 
 double TrialSlater::dH(int state, double x)
@@ -200,6 +205,7 @@ double TrialSlater::dH(int state, double x)
       return 24*x*x - 12;
       break;
   }
+  return 0.0;
 }
 
 double TrialSlater::ddH(int state, double x)
@@ -222,11 +228,14 @@ double TrialSlater::ddH(int state, double x)
       return 48*x;
       break;
   }
+  return 0.0;
 }
 
-double TrialSlater::computeQuantumForce(int p, int d)
+Eigen::Vector2d TrialSlater::computeQuantumForce(int p, int d)
 {
-  //return 2*computeGradient(p,d);
+  Eigen::Vector2d Qforce (GradPhi(p,d),GradJas(p,d));
+  return 2*Qforce;
+  //return 2*(GradPhi(p,d)+GradJas(p,d));
 }
 
 void TrialSlater::computePsiBars(double &psiBar_alpha,
@@ -250,3 +259,35 @@ void TrialSlater::computePsiBars(double &psiBar_alpha,
   psiBar_beta  = -a*r12*r12/((1+beta*r12)*(1+beta*r12));
   */
 }
+
+double TrialSlater::dPhi_alpha(int p, int nx, int ny)
+{
+  const double x = my_system->get_particles()(p,0);
+  const double y = my_system->get_particles()(p,1);
+  const double omega = my_system->get_parameters()[0];
+  const double alpha = my_system->get_parameters()[2];
+  const double alom  = omega*alpha;
+  const double omegasq = sqrt(alom);
+  const double Hnx = H(nx,omegasq*x);
+  const double Hny = H(ny,omegasq*y);
+ 
+  return Hnx*Hny*(-omega*(x*x+y*y)*0.5)*exp(-alom*(x*x+y*y)*0.5);
+}
+
+double TrialSlater::dlnjast_beta ()
+{
+  const int nP        = my_system->get_nParticles();
+  const int nP_2      = nP/2;
+  const double beta   = my_system->get_parameters()[1];
+  const Eigen::MatrixXd rij = my_system->get_r_ij();
+  double argument     = 0.0;
+  for (int i=0 ; i<nP; i++){
+    for (int j=i+1 ; j<nP; j++){
+      const double sep = rij(i,j);
+      const double a   = 1-((i<nP_2)*(j>=nP_2)!=1)*(2.0/3.0);
+      argument += a*sep*sep/((1+beta*sep)*(1+beta*sep)); 
+    }
+  }
+  return argument;
+}
+
