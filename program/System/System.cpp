@@ -263,10 +263,10 @@ bool System::importanceSampling()
 void System::OPTIMIZE()
 {
   
-  int maxIters = 20;
+  int maxIters = 500;
   int optCycles= 1e5;
   int nP_2     = my_nParticles/2;
-  double step  = 0.01;
+  double step  = 0.001;
   for (int i = 0 ; i < maxIters ; i++){
     double Ebar_alpha     = 0;
     double Ebar_beta      = 0;
@@ -278,14 +278,16 @@ void System::OPTIMIZE()
     double cumdSD_alpha   = 0;
     double cumdJas_beta   = 0;
 
-    Eigen::VectorXd d_inv (nP_2);
     my_initialState->setupInitialState(); 
+    Eigen::VectorXd d_inv (nP_2);
     set_DMatrix();
 
     for (int i = 0 ; i < optCycles ; i++){
       dSD_alpha = 0;
       dJas_beta = 0;
       int row   = 0;
+      double phi = 0.0;
+      double jas = 0.0;
       if (importanceSampling()){
         double localEnergy = get_hamiltonian()->computeLocalEnergy();
         for (int p=0 ; p<nP_2 ; p++){
@@ -293,20 +295,25 @@ void System::OPTIMIZE()
           for (int n=0;n<=my_orbitals;n++){
             int nx = n; int ny = 0;
             for (int state=0;state<=n;state++){
-              const double phi_up = my_waveFunction->dPhi_alpha(p,nx,ny);
-              const double phi_dn = my_waveFunction->dPhi_alpha(my_nParticles-p-1,nx,ny);
-              dSD_alpha += phi_up*my_DMatrix_up_inv(row,p)+
-                           phi_dn*my_DMatrix_dn_inv(row,nP_2-p-1);
+              const double phi_up = my_waveFunction->Phi(p,nx,ny);
+              const double phi_dn = my_waveFunction->Phi(my_nParticles-p-1,nx,ny);
+              const double dphi_up = my_waveFunction->dPhi_alpha(p,nx,ny);
+              const double dphi_dn = my_waveFunction->dPhi_alpha(my_nParticles-p-1,nx,ny);
+              dSD_alpha += dphi_up*my_DMatrix_up_inv(row,p)+
+                           dphi_dn*my_DMatrix_dn_inv(row,nP_2-p-1);
+              phi += phi_up*phi_dn;
               row++; nx--; ny++;
             }
           }
         }
+
         dJas_beta = my_waveFunction->dlnjast_beta ();
+        jas  = my_waveFunction->computeJastrow();
         cumElocal     += localEnergy;
-        cumEdSD_alpha += localEnergy*dSD_alpha;
-        cumEdJas_beta += localEnergy*dJas_beta;
-        cumdSD_alpha  += dSD_alpha;
-        cumdJas_beta  += dJas_beta;
+        cumEdSD_alpha += localEnergy*dSD_alpha*jas;
+        cumEdJas_beta += localEnergy*dJas_beta*phi;
+        cumdSD_alpha  += dSD_alpha*jas;
+        cumdJas_beta  += dJas_beta*phi;
       }
     }
     Ebar_alpha = 2*(cumEdSD_alpha - cumdSD_alpha*cumElocal/(double)optCycles)
@@ -314,13 +321,14 @@ void System::OPTIMIZE()
 
     Ebar_beta  = 2*(cumEdJas_beta - cumdJas_beta*cumElocal/(double)optCycles)
                    /(double)optCycles;
-    if (fabs(Ebar_alpha) > 1e-4){
+    cout << Ebar_alpha << " | " << Ebar_beta << endl;
+    if (fabs(Ebar_alpha) > 1e-3)//{
       my_parameters[2] = my_parameters[2] - step*Ebar_alpha;
-      cout<<Ebar_alpha << " | ";}
-    if (fabs(Ebar_beta) > 1e-4){
+      //cout<<Ebar_alpha << " | ";}
+    if (fabs(Ebar_beta) > 1e-3)//{
       my_parameters[1] = my_parameters[1] - step*Ebar_beta;
-      cout << Ebar_beta;}
-    cout << endl;
+      //cout << Ebar_beta;}
+    //cout << endl;
   }
   std::cout << "alpha:  " << my_parameters[2];
   std::cout << "  beta:  " << my_parameters[1] << std::endl;
