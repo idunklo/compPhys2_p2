@@ -2,11 +2,15 @@
 
 HarmonicOscillator::HarmonicOscillator (System* system):
   Hamiltonian(system)
-{}
+{
+  int rank = my_system->get_rank();
+  std::string name = "hamil_"+std::to_string(rank)+".out";
+  my_hamil.open(name,std::ios::out);
+}
 
 double HarmonicOscillator::computeLocalEnergy()
 {
-  //cout << HOLap() << " " << HOExt()<< " " << HRep() << endl;
+  my_hamil << HOLap() << " " << HOExt()<< " " << HRep() << endl;
   return HOLap() + HOExt() + HRep();
 }
 

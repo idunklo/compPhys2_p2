@@ -11,5 +11,7 @@ class HarmonicOscillator : public Hamiltonian
     double  HOLap                   ();
     double  HOExt                   ();
     double  HRep                    ();
+  protected:
+    std::ofstream my_hamil;
 };
 
