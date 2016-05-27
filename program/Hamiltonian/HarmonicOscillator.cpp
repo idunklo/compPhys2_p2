@@ -10,7 +10,7 @@ HarmonicOscillator::HarmonicOscillator (System* system):
 
 double HarmonicOscillator::computeLocalEnergy()
 {
-  my_hamil << HOLap() << " " << HOExt()<< " " << HRep() << endl;
+  //my_hamil << HOLap() << " " << HOExt()<< " " << HRep() << endl;
   return HOLap() + HOExt() + HRep();
 }
 
@@ -66,6 +66,7 @@ double HarmonicOscillator::HOLap()
     my_system->set_SDLap_dn(SD_LAP_new);
   }
   SD_LAP += SD_LAP_new; 
+  my_hamil << SD_LAP << "  " << JastrowLap << "  " << totGrad << endl;
   //cout << SD_LAP << "  " << JastrowLap << "  " << 2*totGrad << endl;
   return -0.5*(SD_LAP + JastrowLap + 2*totGrad);
 }

@@ -108,7 +108,7 @@ class System
     //std::vector<class Particle*>&  get_particle()	{return my_particles;}
     
   protected:
-    //std::ofstream my_oFile;
+    std::ofstream my_oFile;
     bool   my_File                  = false;
     int    rejects                  = 0;
     int    my_rank                  = 0;
