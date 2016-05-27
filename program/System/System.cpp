@@ -72,10 +72,10 @@ bool System::metropolis ()
       i++; nx--; ny++;
     }
   }
-  //if(my_spin)
-  //  my_DMatrix_up.row(my_elected) = SD_row_i;
-  //else
-  //  my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
+  if(my_spin)
+    my_DMatrix_up.row(my_elected) = SD_row_i;
+  else
+    my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
   
 
   //double R_SD_new = my_DMatrix_up.determinant()*
@@ -257,16 +257,15 @@ bool System::importanceSampling()
       my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
     return true;
   }
-  
 }
 
 void System::OPTIMIZE()
 {
   
-  int maxIters = 500;
+  int maxIters = 20;
   int optCycles= 1e5;
   int nP_2     = my_nParticles/2;
-  double step  = 0.001;
+  double step  = 0.01;
   for (int i = 0 ; i < maxIters ; i++){
     double Ebar_alpha     = 0;
     double Ebar_beta      = 0;
@@ -321,12 +320,19 @@ void System::OPTIMIZE()
 
     Ebar_beta  = 2*(cumEdJas_beta - cumdJas_beta*cumElocal/(double)optCycles)
                    /(double)optCycles;
-    cout << Ebar_alpha << " | " << Ebar_beta << endl;
+
     if (fabs(Ebar_alpha) > 1e-3)//{
       my_parameters[2] = my_parameters[2] - step*Ebar_alpha;
       //cout<<Ebar_alpha << " | ";}
     if (fabs(Ebar_beta) > 1e-3)//{
       my_parameters[1] = my_parameters[1] - step*Ebar_beta;
+
+    cout << "==============="<<endl;
+    cout << "Energy:   " <<cumElocal/(double)optCycles << endl;
+    cout << "dE_alpha: " << Ebar_alpha << endl;
+    cout << "dE_beta:  " << Ebar_beta << endl;
+    cout << "alpha:    " << my_parameters[2] << endl;
+    cout << "beta:     " << my_parameters[1] << endl<<endl;
       //cout << Ebar_beta;}
     //cout << endl;
   }
