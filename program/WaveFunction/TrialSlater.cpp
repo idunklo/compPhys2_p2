@@ -36,7 +36,7 @@ double TrialSlater::computeJastrow ()
       argument += a*sep/(1+beta*sep); 
     }
   }
-  return exp(argument);
+  return 0*exp(argument);
 }
 
 double TrialSlater::GradPhi(int k, int d)
@@ -91,7 +91,7 @@ double TrialSlater::GradJas(int k, int d)
 
     Grad += a*(xk-xj)/(r_ij(k,j)*onePbetarkj*onePbetarkj);
   }
-  return Grad;
+  return 0*Grad;
 }
 
 double TrialSlater::LapPhi(int pos,int nx, int ny)
@@ -156,7 +156,7 @@ double TrialSlater::LapJas()
     }
     Lap += (term1+term2);
   }
-  return Lap;
+  return 0*Lap;
 }
 
 double TrialSlater::H(int state, double x)

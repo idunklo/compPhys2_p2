@@ -206,6 +206,7 @@ bool System::importanceSampling()
   my_particles.row(my_elected) += RandMove;
   update_r_ij(my_elected); 
   R_C = my_waveFunction->computeJastrow()/R_C;
+  R_C = 1.0;
   for (int n=0;n<=my_orbitals;n++){
     int nx = n; int ny = 0;
     for (int state=0;state<=n;state++){
@@ -215,16 +216,13 @@ bool System::importanceSampling()
       i++; nx--; ny++;
     }
   }
-  if (SD_row_i.sum()==12315143){
-    cout << my_DMatrix_dn << endl<<endl;
-    cout << my_elected << endl<<endl;
-    cout << SD_row_i.transpose() << endl<<endl;
-    cout << my_particles << endl << endl;
-    cout << d_inv.transpose() << endl<<endl;
-  }
-  //cout << d_inv << endl;
-  //cout << my_DMatrix_up.determinant() << "  "<<my_DMatrix_dn.determinant()<<endl << endl;
-  
+  //if (SD_row_i.sum()==0){
+  //  cout << my_DMatrix_dn << endl<<endl;
+  //  cout << my_elected << endl<<endl;
+  //  cout << SD_row_i.transpose() << endl<<endl;
+  //  cout << my_particles << endl << endl;
+  //  cout << d_inv.transpose() << endl<<endl;
+  //}
 
   QforceX = my_waveFunction->computeQuantumForce(my_elected,0); 
   QforceY = my_waveFunction->computeQuantumForce(my_elected,1); 

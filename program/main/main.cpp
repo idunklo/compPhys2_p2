@@ -35,7 +35,7 @@ int main (int argc,char* argv[]){
   const double  stepLength      = 0.005;
 
   std::vector<double> parameters {omega, beta, alpha};
-  int nParticles = 20;
+  int nParticles = 12;
   int orbitals   = 0;
   switch (nParticles)
   {

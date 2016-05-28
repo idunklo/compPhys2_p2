@@ -11,7 +11,7 @@ HarmonicOscillator::HarmonicOscillator (System* system):
 double HarmonicOscillator::computeLocalEnergy()
 {
   //my_hamil << HOLap() << " " << HOExt()<< " " << HRep() << endl;
-  return HOLap() + HOExt() + HRep();
+  return HOLap() + HOExt() ;//+ HRep();
 }
 
 double HarmonicOscillator::HOLap()
