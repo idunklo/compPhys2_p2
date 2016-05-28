@@ -18,7 +18,7 @@ double TrialSlater::Phi(int p, int nx, int ny)
   const double omegasq = sqrt(omega*alpha);
   const double Hnx = H(nx,omegasq*x);
   const double Hny = H(ny,omegasq*y);
- 
+
   return Hnx*Hny*exp(-omega*alpha*(x*x+y*y)*0.5);
 }
 
@@ -58,12 +58,10 @@ double TrialSlater::GradPhi(int k, int d)
     d_inv = my_system->get_DMatrix_up_inv().col(k);
   else
     d_inv = my_system->get_DMatrix_dn_inv().col(k-nP/2);
-
   for (int shell = 0 ; shell <= orbitals ; shell++){
     int nx = shell; int ny = 0;
     for (int state = 0 ; state <= shell ; state++){
       const double grad = dH(nx,x)*H(ny,y) + H(nx,x)*H(ny,y)*de;
-
       Grad += grad*d_inv(col); 
       col++; nx--; ny++;
     }
@@ -79,7 +77,6 @@ double TrialSlater::GradJas(int k, int d)
   const Eigen::MatrixXd r_ij = my_system->get_r_ij();
   const double xk = my_system->get_particles()(k,d);
   double Grad = 0.0;
-
   for (int j = 0 ; j < k ; j++){
     const double a   = 1-((k<nP_2)*(j>=nP_2)!=1)*(2.0/3.0);
     const double xj = my_system->get_particles()(j,d);

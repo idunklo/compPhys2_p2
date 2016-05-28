@@ -50,8 +50,8 @@ double HarmonicOscillator::HOLap()
     }
   }
   
-  //cout << "Sd " << SD_LAP_new << endl;
   double totGrad = 0.0;
+  my_hamil << SD_LAP << "  " << JastrowLap << "  " << totGrad << endl;
   for (int i = 0 ; i<nP ; i++){
     totGrad += my_system->get_waveFunction()->GradPhi(i,0)
             *  my_system->get_waveFunction()->GradJas(i,0)

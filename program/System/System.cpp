@@ -183,7 +183,6 @@ bool System::importanceSampling()
 
   std::uniform_int_distribution<int> particle (0,my_nParticles-1);
   std::normal_distribution<double>   my_normal (0,sqrt(my_stepLength));
-
   my_elected = particle(my_generator);
   my_spin = 0;
   if(my_elected<detSize){my_spin=1;}
@@ -194,12 +193,11 @@ bool System::importanceSampling()
     d_inv = my_DMatrix_up_inv.col(my_elected);
   else
     d_inv = my_DMatrix_dn_inv.col(my_elected-detSize);
-  
-  
+
   QforceX = my_waveFunction->computeQuantumForce(my_elected,0); 
   QforceY = my_waveFunction->computeQuantumForce(my_elected,1); 
   QforceOld << QforceX(0)+QforceX(1), QforceY(0)+QforceY(1);
-  
+
   RandMove << (my_normal(my_generator) + 0.5*my_stepLength*QforceOld(0)),
               (my_normal(my_generator) + 0.5*my_stepLength*QforceOld(1));
 
@@ -217,8 +215,17 @@ bool System::importanceSampling()
       i++; nx--; ny++;
     }
   }
-  //QforceNew << my_waveFunction->computeQuantumForce(my_elected, 0),
-  //             my_waveFunction->computeQuantumForce(my_elected, 1);
+  if (SD_row_i.sum()==12315143){
+    cout << my_DMatrix_dn << endl<<endl;
+    cout << my_elected << endl<<endl;
+    cout << SD_row_i.transpose() << endl<<endl;
+    cout << my_particles << endl << endl;
+    cout << d_inv.transpose() << endl<<endl;
+  }
+  //cout << d_inv << endl;
+  //cout << my_DMatrix_up.determinant() << "  "<<my_DMatrix_dn.determinant()<<endl << endl;
+  
+
   QforceX = my_waveFunction->computeQuantumForce(my_elected,0); 
   QforceY = my_waveFunction->computeQuantumForce(my_elected,1); 
   QforceNew << QforceX(0)/(R_SD) + QforceX(1),
@@ -232,9 +239,10 @@ bool System::importanceSampling()
   
   const double compared = exp(greensArg) * R_SD*R_SD * R_C*R_C;
 
-  if (compared < my_uniform(my_generator)){
+  if (compared < my_uniform(my_generator) or compared!=compared){
     my_particles.row(my_elected) -= RandMove;
     update_r_ij(my_elected);
+    //cout << my_particles << endl<<endl;
     return false;
   }
   else{
@@ -248,7 +256,9 @@ bool System::importanceSampling()
     //                 SD_row_i, my_elected-detSize, R_SD);
     //  my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
     //}
-    //cout << my_DMatrix_up_inv << endl;
+    
+    //cout << my_DMatrix_up_inv.determinant() <<"  "<<my_DMatrix_dn_inv.determinant()<< endl;
+    //cout << my_DMatrix_up.determinant() << "  "<<my_DMatrix_dn.determinant()<<endl << endl;
     my_DMatrix_up_inv = my_DMatrix_up.inverse();
     my_DMatrix_dn_inv = my_DMatrix_dn.inverse();
     if(my_spin)
@@ -371,7 +381,7 @@ void System::set_DMatrix()
   //cout << my_DMatrix_up_inv << endl;
   //cout << my_DMatrix_dn_inv << endl;
   //cout << my_DMatrix_up << endl;
-  //cout << my_DMatrix_dn << endl;
+  //cout << my_DMatrix_dn << endl<<endl;
 
   for (int i = 0 ; i < nP ; i++){
     const double xi = my_particles(i,0);
