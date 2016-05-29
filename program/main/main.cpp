@@ -29,13 +29,13 @@ int main (int argc,char* argv[]){
   const int 	  nCycles	        = (int) 1e5;
   const double  omega		        = 1.0;
   const double  alpha           = 0.95;
-  const double  beta		        = 0.5;//0.50905;
+  const double  beta		        = 0.45;//0.50905;
   const double  equilibration	  = 0.1;
   const double  derivativeStep  = 0.001;
-  const double  stepLength      = 2.0;//0.005;
+  const double  stepLength      = 0.005;
 
   std::vector<double> parameters {omega, beta, alpha};
-  int nParticles = 20;
+  int nParticles = 6;
   int orbitals   = 0;
   switch (nParticles)
   {

@@ -13,8 +13,8 @@ void System::runMetropolis ()
   my_generator.seed(seed);
 
   for (int cycle = 0 ; cycle < my_nCycles ; cycle++){
-    accepted = metropolis();
-    //accepted = importanceSampling();
+    //accepted = metropolis();
+    accepted = importanceSampling();
     if (cycle > my_equilibrationFraction * my_nCycles)
       my_sampler->sample(accepted);
   }
@@ -232,7 +232,7 @@ bool System::importanceSampling()
   greensArg  = ((QforceOld+QforceNew).dot
                (StepDiff + (QforceOld-QforceNew)*0.25*my_stepLength))*0.5;
   
-  const double compared = fabs(exp(greensArg) * R_SD*R_SD);// * R_C*R_C);
+  const double compared = fabs(exp(greensArg) * R_SD*R_SD * R_C*R_C);
   if(compared!=compared)
     cout << exp(greensArg)<<" " << R_SD<<" " <<R_C<<endl;
   if (compared < my_uniform(my_generator) or compared!=compared){

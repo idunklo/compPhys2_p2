@@ -33,7 +33,7 @@ double TrialSlater::computeJastrow ()
   for (int i=0 ; i<nP; i++){
     for (int j=i+1 ; j<nP; j++){
       const double sep = rij(i,j);
-      const double a   = aij(i,j);//1-((i<nP_2)*(j>=nP_2)!=1)*(2.0/3.0);
+      const double a   = aij(i,j);
       argument += a*sep/(1+beta*sep); 
     }
   }
@@ -132,7 +132,7 @@ double TrialSlater::LapJas()
     for (int i=k+1 ; i<nP ; i++){
       const double xi = my_system->get_particles()(i,0);
       const double yi = my_system->get_particles()(i,1);
-      const double aki= a(k,i);//1-((k<nP_2)*(i>=nP_2)!=1)*(2.0/3.0);
+      const double aki= a(k,i);
       const double r_ki = r_ij(k,i);
       const double bri  = 1+beta*r_ki;
       
@@ -141,7 +141,7 @@ double TrialSlater::LapJas()
       for(int j=k+1 ; j<nP ; j++){
         const double xj = my_system->get_particles()(j,0);
         const double yj = my_system->get_particles()(j,1);
-        const double akj= a(k,j);//1-((k<nP_2)*(j>=nP_2)!=1)*(2.0/3.0);
+        const double akj= a(k,j);
         const double r_kj = r_ij(k,j); 
         const double brj  = 1+beta*r_kj;
 
@@ -276,11 +276,12 @@ double TrialSlater::dlnjast_beta ()
   const int nP_2      = nP/2;
   const double beta   = my_system->get_parameters()[1];
   const Eigen::MatrixXd rij = my_system->get_r_ij();
+  const Eigen::MatrixXd aij = my_system->get_a();
   double argument     = 0.0;
   for (int i=0 ; i<nP; i++){
     for (int j=i+1 ; j<nP; j++){
       const double sep = rij(i,j);
-      const double a   = 1-((i<nP_2)*(j>=nP_2)!=1)*(2.0/3.0);
+      const double a   = aij(i,j);
       argument += a*sep*sep/((1+beta*sep)*(1+beta*sep)); 
     }
   }
