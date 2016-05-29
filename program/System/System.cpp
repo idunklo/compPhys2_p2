@@ -211,6 +211,11 @@ bool System::importanceSampling()
   update_r_ij(my_elected); 
   R_C = my_waveFunction->computeJastrow()/R_C;
 
+  QforceX = my_waveFunction->computeQuantumForce(my_elected,0); 
+  QforceY = my_waveFunction->computeQuantumForce(my_elected,1); 
+  QforceNew << QforceX(0)/(R_SD) + QforceX(1),
+               QforceY(0)/(R_SD) + QforceY(1);
+
   for (int n=0;n<=my_orbitals;n++){
     int nx = n; int ny = 0;
     for (int state=0;state<=n;state++){
@@ -221,10 +226,6 @@ bool System::importanceSampling()
     }
   }
  
-  QforceX = my_waveFunction->computeQuantumForce(my_elected,0); 
-  QforceY = my_waveFunction->computeQuantumForce(my_elected,1); 
-  QforceNew << QforceX(0)/(R_SD) + QforceX(1),
-               QforceY(0)/(R_SD) + QforceY(1);
 
   StepDiff << OldPos(0) - my_particles.row(my_elected)(0),
               OldPos(1) - my_particles.row(my_elected)(1);
