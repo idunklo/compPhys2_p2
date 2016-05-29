@@ -32,10 +32,10 @@ int main (int argc,char* argv[]){
   const double  beta		        = 0.5;//0.50905;
   const double  equilibration	  = 0.1;
   const double  derivativeStep  = 0.001;
-  const double  stepLength      = 0.005;
+  const double  stepLength      = 2.0;//0.005;
 
   std::vector<double> parameters {omega, beta, alpha};
-  int nParticles = 12;
+  int nParticles = 20;
   int orbitals   = 0;
   switch (nParticles)
   {
@@ -53,6 +53,9 @@ int main (int argc,char* argv[]){
     case 20:
       orbitals   = 3;
       break;
+    default:
+      cout << "Only 2, 6, 12 or 20 particles allowed" << endl;
+      exit(1);
   }
 
   System* system = new System(File);
@@ -71,7 +74,7 @@ int main (int argc,char* argv[]){
 
   system->set_DMatrix();
   //system->OPTIMIZE();
-  
+  //system->get_waveFunction()->LapJas();
   system->runMetropolis		();
   MPI_Finalize();
   return 0;

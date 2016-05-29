@@ -18,6 +18,7 @@ class WaveFunction
     virtual double dlnjast_beta         () = 0;
     double computeDerivative            (int p, int d, double waveFunctionCurrent);
     double computeDoubleDerivative      (int p, int d, double waveFunctionCurrent);
+    bool test = 0;
     
 
   protected:

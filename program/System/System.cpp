@@ -13,8 +13,8 @@ void System::runMetropolis ()
   my_generator.seed(seed);
 
   for (int cycle = 0 ; cycle < my_nCycles ; cycle++){
-    //accepted = metropolis();
-    accepted = importanceSampling();
+    accepted = metropolis();
+    //accepted = importanceSampling();
     if (cycle > my_equilibrationFraction * my_nCycles)
       my_sampler->sample(accepted);
   }
@@ -28,37 +28,36 @@ bool System::metropolis ()
   int i         = 0;
   double R_C    = 0.0;
   double R_SD   = 0;
-  double randX, randY;
   my_spin = 0;
-  Eigen::Vector2d old_pos;
+  Eigen::Vector2d RandMov;
   Eigen::VectorXd d_inv (detSize);
   Eigen::VectorXd SD_row_i (detSize);
   Eigen::MatrixXd DMatrix_old_up (detSize,detSize);
   Eigen::MatrixXd DMatrix_old_dn (detSize,detSize);
   
-
   /* Choosing particle to move and saving old positions */
   std::uniform_int_distribution<int> particle  (0,my_nParticles-1);
   my_elected = particle(my_generator);
   if(my_elected<detSize){my_spin=1;}
-  old_pos = my_particles.row(my_elected);
-  randX = my_stepLength*(my_uniform(my_generator)-0.5);
-  randY = my_stepLength*(my_uniform(my_generator)-0.5);
+
+  RandMov << my_stepLength*(my_uniform(my_generator)-0.5),
+             my_stepLength*(my_uniform(my_generator)-0.5);
   
   /* Getting column from inverse SD */
-  if (my_spin)
+  if (my_spin){
     d_inv = my_DMatrix_up_inv.col(my_elected);
-  else
+  }
+  else{
     d_inv = my_DMatrix_dn_inv.col(my_elected-detSize);
+  }
   /* Calculating correlation ratio */
-  DMatrix_old_up = my_DMatrix_up;
-  DMatrix_old_dn = my_DMatrix_dn;
+  //DMatrix_old_up = my_DMatrix_up;
+  //DMatrix_old_dn = my_DMatrix_dn;
   //double R_SD_old = my_DMatrix_up.determinant()*
-  //                 my_DMatrix_dn.determinant();
+  //                  my_DMatrix_dn.determinant();
 
   R_C = my_waveFunction->computeJastrow();
-  my_particles(my_elected,0) += randX;
-  my_particles(my_elected,1) += randY;
+  my_particles.row(my_elected) += RandMov;
   update_r_ij(my_elected);
   R_C = my_waveFunction->computeJastrow()/R_C;
 
@@ -67,30 +66,25 @@ bool System::metropolis ()
     int nx = n; int ny = 0;
     for (int state=0;state<=n;state++){
       const double phi = my_waveFunction->Phi(my_elected,nx,ny);
+      //cout << phi <<" * " << d_inv(i) <<" = " << phi*d_inv(i)<<endl;
       R_SD += phi*d_inv(i);
       SD_row_i(i) = phi;
       i++; nx--; ny++;
     }
   }
-  if(my_spin)
-    my_DMatrix_up.row(my_elected) = SD_row_i;
-  else
-    my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
-  
-
+  //if(my_spin)
+  //  my_DMatrix_up.row(my_elected) = SD_row_i;
+  //else
+  //  my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
   //double R_SD_new = my_DMatrix_up.determinant()*
   //                  my_DMatrix_dn.determinant();
-
-  //R_SD = (R_SD_new*R_SD_new)/(R_SD_old*R_SD_old);
-  R_SD*= R_SD;
-  R_C *= R_C;
+  //
+  //R_SD = R_SD_new/R_SD_old;
   //R_C = 1;
-  const double RATIO = fabs(R_SD*R_C);
-
-  if (RATIO < my_uniform(my_generator)){
-    rejects += 1;
-    my_particles(my_elected,0) -= randX;
-    my_particles(my_elected,1) -= randY;
+  const double RATIO = fabs(R_SD*R_SD*R_C*R_C);
+  //cout << RATIO << endl<<endl;
+  if (RATIO < my_uniform(my_generator)){// or RATIO!=RATIO){
+    my_particles.row(my_elected) -= RandMov;
     update_r_ij(my_elected);
     //my_DMatrix_up = DMatrix_old_up;
     //my_DMatrix_dn = DMatrix_old_dn;
@@ -189,11 +183,12 @@ bool System::importanceSampling()
 
   OldPos = my_particles.row(my_elected);
 
-  if (my_spin)
+  if (my_spin){
     d_inv = my_DMatrix_up_inv.col(my_elected);
-  else
+  }
+  else{
     d_inv = my_DMatrix_dn_inv.col(my_elected-detSize);
-
+  }
   QforceX = my_waveFunction->computeQuantumForce(my_elected,0); 
   QforceY = my_waveFunction->computeQuantumForce(my_elected,1); 
   QforceOld << QforceX(0)+QforceX(1), QforceY(0)+QforceY(1);
@@ -201,12 +196,21 @@ bool System::importanceSampling()
   RandMove << (my_normal(my_generator) + 0.5*my_stepLength*QforceOld(0)),
               (my_normal(my_generator) + 0.5*my_stepLength*QforceOld(1));
 
+  if (fabs(QforceOld(0))>100000){
+    cout << QforceOld.transpose() << endl;
+    cout << RandMove.transpose() << endl<<endl;
+    cout << my_DMatrix_dn << endl<<endl;
+    //cout << my_elected << endl<<endl;
+    //cout << SD_row_i.transpose() << endl<<endl;
+    //cout << my_particles << endl << endl;
+    //cout << d_inv.transpose() << endl<<endl;
+  }
   R_C = my_waveFunction->computeJastrow();
 
   my_particles.row(my_elected) += RandMove;
   update_r_ij(my_elected); 
   R_C = my_waveFunction->computeJastrow()/R_C;
-  R_C = 1.0;
+
   for (int n=0;n<=my_orbitals;n++){
     int nx = n; int ny = 0;
     for (int state=0;state<=n;state++){
@@ -216,14 +220,7 @@ bool System::importanceSampling()
       i++; nx--; ny++;
     }
   }
-  //if (SD_row_i.sum()==0){
-  //  cout << my_DMatrix_dn << endl<<endl;
-  //  cout << my_elected << endl<<endl;
-  //  cout << SD_row_i.transpose() << endl<<endl;
-  //  cout << my_particles << endl << endl;
-  //  cout << d_inv.transpose() << endl<<endl;
-  //}
-
+ 
   QforceX = my_waveFunction->computeQuantumForce(my_elected,0); 
   QforceY = my_waveFunction->computeQuantumForce(my_elected,1); 
   QforceNew << QforceX(0)/(R_SD) + QforceX(1),
@@ -235,8 +232,9 @@ bool System::importanceSampling()
   greensArg  = ((QforceOld+QforceNew).dot
                (StepDiff + (QforceOld-QforceNew)*0.25*my_stepLength))*0.5;
   
-  const double compared = exp(greensArg) * R_SD*R_SD * R_C*R_C;
-
+  const double compared = fabs(exp(greensArg) * R_SD*R_SD);// * R_C*R_C);
+  if(compared!=compared)
+    cout << exp(greensArg)<<" " << R_SD<<" " <<R_C<<endl;
   if (compared < my_uniform(my_generator) or compared!=compared){
     my_particles.row(my_elected) -= RandMove;
     update_r_ij(my_elected);
@@ -355,9 +353,11 @@ void System::set_DMatrix()
   Eigen::MatrixXd DMatrix1 (nP/2,nP/2);
   Eigen::MatrixXd DMatrix2 (nP/2,nP/2);
   Eigen::MatrixXd r_ij     (nP,nP);
+  Eigen::MatrixXd a_ij     (nP,nP);
   DMatrix1.setZero();
   DMatrix2.setZero();
   r_ij.setZero();
+  a_ij.setZero();
   //r_ij = Eigen::MatrixXd::Zero(nP,nP);
   int row = 0;
   for (int n=0;n<=my_orbitals;n++){
@@ -376,8 +376,8 @@ void System::set_DMatrix()
   my_DMatrix_dn     = DMatrix2;
   my_DMatrix_up_inv = DMatrix1.inverse();
   my_DMatrix_dn_inv = DMatrix2.inverse();
-  //cout << my_DMatrix_up_inv << endl;
-  //cout << my_DMatrix_dn_inv << endl;
+  //cout << my_DMatrix_up_inv.sum() << endl;
+  //cout << my_DMatrix_dn_inv.sum() << endl;
   //cout << my_DMatrix_up << endl;
   //cout << my_DMatrix_dn << endl<<endl;
 
@@ -388,9 +388,13 @@ void System::set_DMatrix()
       const double xj = my_particles(j,0);
       const double yj = my_particles(j,1);
       r_ij(i,j) = sqrt((xi-xj)*(xi-xj) + (yi-yj)*(yi-yj));
+      if (i<nP/2)
+        a_ij(i,j) = 1-(j<nP/2)*(2.0/3.0);
+      else
+        a_ij(i,j) = 1-(j>=nP/2)*(2.0/3.0);
     }
   }
   my_r_ij = r_ij;
-  
+  my_a = a_ij;
 }
 

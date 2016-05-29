@@ -99,6 +99,7 @@ class System
     Eigen::MatrixXd& get_DMatrix_dn     (){return my_DMatrix_dn;}
     Eigen::MatrixXd& get_DMatrix_dn_inv (){return my_DMatrix_dn_inv;}
     Eigen::MatrixXd& get_r_ij           (){return my_r_ij;}
+    Eigen::MatrixXd& get_a              (){return my_a;}
     Eigen::MatrixXd& get_particles      (){return my_particles;}
 
     class Hamiltonian*    get_hamiltonian   (){return my_hamiltonian;}
@@ -110,7 +111,6 @@ class System
   protected:
     std::ofstream my_oFile;
     bool   my_File                  = false;
-    int    rejects                  = 0;
     int    my_rank                  = 0;
     int    num_procs                = 1;
     int    my_elected               = 0;
@@ -131,6 +131,7 @@ class System
     Eigen::MatrixXd my_DMatrix_up_inv;
     Eigen::MatrixXd my_DMatrix_dn_inv;
     Eigen::MatrixXd my_r_ij;
+    Eigen::MatrixXd my_a;
     Eigen::MatrixXd my_particles;
     std::vector<double> my_parameters	= std::vector<double>();
 

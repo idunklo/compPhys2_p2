@@ -5,13 +5,13 @@ HarmonicOscillator::HarmonicOscillator (System* system):
 {
   int rank = my_system->get_rank();
   std::string name = "hamil_"+std::to_string(rank)+".out";
-  my_hamil.open(name,std::ios::out);
+  //my_hamil.open(name,std::ios::out);
 }
 
 double HarmonicOscillator::computeLocalEnergy()
 {
-  //my_hamil << HOLap() << " " << HOExt()<< " " << HRep() << endl;
-  return HOLap() + HOExt() ;//+ HRep();
+  //cout << HOLap()<<" + "<<HOExt()<<" = "<<HOLap() + HOExt() << endl;
+  return HOLap() + HOExt() + HRep();
 }
 
 double HarmonicOscillator::HOLap()
@@ -24,7 +24,7 @@ double HarmonicOscillator::HOLap()
   int row            = 0;
   double SD_LAP      = 0.0;
   double SD_LAP_new  = 0.0;
-  Eigen::MatrixXd D_inv(nP/2,nP/2);;
+  Eigen::MatrixXd D_inv(nP/2,nP/2);
   D_inv.setZero();
   if(spin){
     SD_LAP   = my_system->get_SDLap_old_dn();
@@ -51,7 +51,7 @@ double HarmonicOscillator::HOLap()
   }
   
   double totGrad = 0.0;
-  my_hamil << SD_LAP << "  " << JastrowLap << "  " << totGrad << endl;
+  //my_hamil << SD_LAP << "  " << JastrowLap << "  " << totGrad << endl;
   for (int i = 0 ; i<nP ; i++){
     totGrad += my_system->get_waveFunction()->GradPhi(i,0)
             *  my_system->get_waveFunction()->GradJas(i,0)
@@ -66,7 +66,9 @@ double HarmonicOscillator::HOLap()
     my_system->set_SDLap_dn(SD_LAP_new);
   }
   SD_LAP += SD_LAP_new; 
-  my_hamil << SD_LAP << "  " << JastrowLap << "  " << totGrad << endl;
+  //if (fabs(SD_LAP) > 200)
+  //  cout << D_inv << endl<<endl;
+  //my_hamil << SD_LAP << "  " << JastrowLap << "  " << totGrad << endl;
   //cout << SD_LAP << "  " << JastrowLap << "  " << 2*totGrad << endl;
   return -0.5*(SD_LAP + JastrowLap + 2*totGrad);
 }
