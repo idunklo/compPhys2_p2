@@ -203,7 +203,7 @@ bool System::importanceSampling()
     //cout << my_elected << endl<<endl;
     //cout << SD_row_i.transpose() << endl<<endl;
     //cout << my_particles << endl << endl;
-    //cout << d_inv.transpose() << endl<<endl;
+    cout << d_inv.transpose() << endl<<endl;
   }
   R_C = my_waveFunction->computeJastrow();
 
