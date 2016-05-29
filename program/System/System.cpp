@@ -201,6 +201,16 @@ bool System::importanceSampling()
   my_particles.row(my_elected) += RandMove;
   update_r_ij(my_elected); 
   R_C = my_waveFunction->computeJastrow()/R_C;
+  if (fabs(QforceOld(0))>100000){
+    //cout << QforceOld.transpose() << endl;
+    //cout << RandMove.transpose() << endl<<endl;
+    //cout << my_DMatrix_up.determinant() << "  "
+    //     << my_DMatrix_dn.determinant() << endl<<endl;
+    //cout << my_elected << endl<<endl;
+    //cout << SD_row_i.transpose() << endl<<endl;
+    //cout << my_particles << endl << endl;
+    //cout << d_inv.transpose() << endl<<endl;
+  }
 
 
   for (int n=0;n<=my_orbitals;n++){
@@ -225,16 +235,6 @@ bool System::importanceSampling()
                (StepDiff + (QforceOld-QforceNew)*0.25*my_stepLength))*0.5;
   
   const double compared = fabs(exp(greensArg) * R_SD*R_SD * R_C*R_C);
-  if (fabs(QforceOld(0))>100000){
-    //cout << QforceOld.transpose() << endl;
-    //cout << RandMove.transpose() << endl<<endl;
-    cout << my_DMatrix_up.determinant() << "  "
-         << my_DMatrix_dn.determinant() << endl<<endl;
-    //cout << my_elected << endl<<endl;
-    //cout << SD_row_i.transpose() << endl<<endl;
-    //cout << my_particles << endl << endl;
-    cout << d_inv.transpose() << endl<<endl;
-  }
   if (compared < my_uniform(my_generator) or compared!=compared){
     my_particles.row(my_elected) -= RandMove;
     update_r_ij(my_elected);
@@ -253,10 +253,11 @@ bool System::importanceSampling()
     //  my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
     //}
     
-    //cout << my_DMatrix_up_inv.determinant() <<"  "<<my_DMatrix_dn_inv.determinant()<< endl;
-    //cout << my_DMatrix_up.determinant() << "  "<<my_DMatrix_dn.determinant()<<endl << endl;
     my_DMatrix_up_inv = my_DMatrix_up.inverse();
     my_DMatrix_dn_inv = my_DMatrix_dn.inverse();
+    cout << my_DMatrix_up_inv.determinant() <<"  "<<my_DMatrix_dn_inv.determinant()<< endl;
+    cout << my_DMatrix_up.determinant() << "  "<<my_DMatrix_dn.determinant()<<endl << endl;
+
     if(my_spin)
       my_DMatrix_up.row(my_elected) = SD_row_i;
     else
