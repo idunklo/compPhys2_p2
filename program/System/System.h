@@ -105,6 +105,7 @@ class System
     class Hamiltonian*    get_hamiltonian   (){return my_hamiltonian;}
     class WaveFunction*		get_waveFunction  (){return my_waveFunction;}
     class Sampler*		    get_sampler       (){return	my_sampler;}
+    class InitialState*   get_initialState  (){return my_initialState;}
     class Timer*		      get_timer         (){return my_timer;}
     //std::vector<class Particle*>&  get_particle()	{return my_particles;}
     

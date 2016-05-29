@@ -82,6 +82,7 @@ bool System::metropolis ()
   //R_SD = R_SD_new/R_SD_old;
   //R_C = 1;
   const double RATIO = fabs(R_SD*R_SD*R_C*R_C);
+  //cout << d_inv.transpose() <<endl;
   //cout << RATIO << endl<<endl;
   if (RATIO < my_uniform(my_generator)){// or RATIO!=RATIO){
     my_particles.row(my_elected) -= RandMov;
@@ -255,13 +256,13 @@ bool System::importanceSampling()
     
     my_DMatrix_up_inv = my_DMatrix_up.inverse();
     my_DMatrix_dn_inv = my_DMatrix_dn.inverse();
-    cout << my_DMatrix_up_inv.determinant() <<"  "<<my_DMatrix_dn_inv.determinant()<< endl;
-    cout << my_DMatrix_up.determinant() << "  "<<my_DMatrix_dn.determinant()<<endl << endl;
-
     if(my_spin)
       my_DMatrix_up.row(my_elected) = SD_row_i;
     else
       my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
+    //cout << my_DMatrix_up_inv.determinant() <<"  "<<my_DMatrix_dn_inv.determinant()<< endl;
+    //cout << my_DMatrix_up.determinant() << "  "<<my_DMatrix_dn.determinant()<<endl << endl;
+
     return true;
   }
 }
@@ -367,21 +368,22 @@ void System::set_DMatrix()
       for (int j=0;j<my_nParticles/2;j++){
         const double phi1 = my_waveFunction->Phi(j,nx,ny);
         const double phi2 = my_waveFunction->Phi(j+nP/2,nx,ny);
+        //cout << phi1 <<"  "<<phi2<<endl;
         DMatrix1(row,j) = phi1;
         DMatrix2(row,j) = phi2;
       }
-      row+=1; nx -= 1; ny += 1;
+      row++; nx -= 1; ny += 1;
     }
   }
+  //cout << endl;
   my_DMatrix_up     = DMatrix1;
   my_DMatrix_dn     = DMatrix2;
   my_DMatrix_up_inv = DMatrix1.inverse();
   my_DMatrix_dn_inv = DMatrix2.inverse();
-  //cout << my_DMatrix_up_inv.sum() << endl;
-  //cout << my_DMatrix_dn_inv.sum() << endl;
-  //cout << my_DMatrix_up << endl;
-  //cout << my_DMatrix_dn << endl<<endl;
-
+  //cout << my_DMatrix_up_inv.determinant() << endl;
+  //cout << my_DMatrix_dn_inv.determinant() << endl;
+  //cout << my_DMatrix_up.determinant() << endl;
+  //cout << my_DMatrix_dn.determinant() << endl<<endl;
   for (int i = 0 ; i < nP ; i++){
     const double xi = my_particles(i,0);
     const double yi = my_particles(i,1);

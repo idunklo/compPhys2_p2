@@ -72,7 +72,11 @@ int main (int argc,char* argv[]){
   system->set_WaveFunction	        (new TrialSlater (system));
   system->set_InitialState	        (new RandomUniform	 (system, nDimensions, nParticles));
 
-  system->set_DMatrix();
+    //system->get_initialState()->setupInitialState();
+    system->set_DMatrix();
+  //for (int i=0; i<100 ;i++){
+  //  system->metropolis();
+  //}
   //system->OPTIMIZE();
   //system->get_waveFunction()->LapJas();
   system->runMetropolis		();
