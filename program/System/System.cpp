@@ -196,16 +196,6 @@ bool System::importanceSampling()
   RandMove << (my_normal(my_generator) + 0.5*my_stepLength*QforceOld(0)),
               (my_normal(my_generator) + 0.5*my_stepLength*QforceOld(1));
 
-  if (fabs(QforceOld(0))>100000){
-    //cout << QforceOld.transpose() << endl;
-    //cout << RandMove.transpose() << endl<<endl;
-    cout << my_DMatrix_up.determinant() << "  "
-         << my_DMatrix_dn.determinant() << endl<<endl;
-    //cout << my_elected << endl<<endl;
-    //cout << SD_row_i.transpose() << endl<<endl;
-    //cout << my_particles << endl << endl;
-    cout << d_inv.transpose() << endl<<endl;
-  }
   R_C = my_waveFunction->computeJastrow();
 
   my_particles.row(my_elected) += RandMove;
@@ -255,6 +245,16 @@ bool System::importanceSampling()
     
     //cout << my_DMatrix_up_inv.determinant() <<"  "<<my_DMatrix_dn_inv.determinant()<< endl;
     //cout << my_DMatrix_up.determinant() << "  "<<my_DMatrix_dn.determinant()<<endl << endl;
+  if (fabs(QforceOld(0))>100000){
+    //cout << QforceOld.transpose() << endl;
+    //cout << RandMove.transpose() << endl<<endl;
+    cout << my_DMatrix_up.determinant() << "  "
+         << my_DMatrix_dn.determinant() << endl<<endl;
+    //cout << my_elected << endl<<endl;
+    //cout << SD_row_i.transpose() << endl<<endl;
+    //cout << my_particles << endl << endl;
+    cout << d_inv.transpose() << endl<<endl;
+  }
     my_DMatrix_up_inv = my_DMatrix_up.inverse();
     my_DMatrix_dn_inv = my_DMatrix_dn.inverse();
     if(my_spin)
