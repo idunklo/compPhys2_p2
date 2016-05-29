@@ -199,11 +199,11 @@ bool System::importanceSampling()
   if (fabs(QforceOld(0))>100000){
     //cout << QforceOld.transpose() << endl;
     //cout << RandMove.transpose() << endl<<endl;
-    //cout << my_DMatrix_dn << endl<<endl;
+    cout << my_DMatrix_dn << endl<<endl;
     //cout << my_elected << endl<<endl;
     //cout << SD_row_i.transpose() << endl<<endl;
     //cout << my_particles << endl << endl;
-    cout << d_inv.transpose() << endl<<endl;
+    //cout << d_inv.transpose() << endl<<endl;
   }
   R_C = my_waveFunction->computeJastrow();
 
