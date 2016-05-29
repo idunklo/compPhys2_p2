@@ -202,7 +202,7 @@ bool System::importanceSampling()
     //cout << my_DMatrix_dn << endl<<endl;
     //cout << my_elected << endl<<endl;
     //cout << SD_row_i.transpose() << endl<<endl;
-    //cout << my_particles << endl << endl;
+    cout << my_particles << endl << endl;
     //cout << d_inv.transpose() << endl<<endl;
   }
   R_C = my_waveFunction->computeJastrow();
@@ -211,10 +211,6 @@ bool System::importanceSampling()
   update_r_ij(my_elected); 
   R_C = my_waveFunction->computeJastrow()/R_C;
 
-  QforceX = my_waveFunction->computeQuantumForce(my_elected,0); 
-  QforceY = my_waveFunction->computeQuantumForce(my_elected,1); 
-  QforceNew << QforceX(0)/(R_SD) + QforceX(1),
-               QforceY(0)/(R_SD) + QforceY(1);
 
   for (int n=0;n<=my_orbitals;n++){
     int nx = n; int ny = 0;
@@ -225,7 +221,11 @@ bool System::importanceSampling()
       i++; nx--; ny++;
     }
   }
- 
+
+  QforceX = my_waveFunction->computeQuantumForce(my_elected,0); 
+  QforceY = my_waveFunction->computeQuantumForce(my_elected,1); 
+  QforceNew << QforceX(0)/(R_SD) + QforceX(1),
+               QforceY(0)/(R_SD) + QforceY(1);
 
   StepDiff << OldPos(0) - my_particles.row(my_elected)(0),
               OldPos(1) - my_particles.row(my_elected)(1);
