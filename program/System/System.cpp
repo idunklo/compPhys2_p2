@@ -197,9 +197,9 @@ bool System::importanceSampling()
               (my_normal(my_generator) + 0.5*my_stepLength*QforceOld(1));
 
   if (fabs(QforceOld(0))>100000){
-    cout << QforceOld.transpose() << endl;
-    cout << RandMove.transpose() << endl<<endl;
-    cout << my_DMatrix_dn << endl<<endl;
+    //cout << QforceOld.transpose() << endl;
+    //cout << RandMove.transpose() << endl<<endl;
+    //cout << my_DMatrix_dn << endl<<endl;
     //cout << my_elected << endl<<endl;
     //cout << SD_row_i.transpose() << endl<<endl;
     //cout << my_particles << endl << endl;
@@ -233,8 +233,6 @@ bool System::importanceSampling()
                (StepDiff + (QforceOld-QforceNew)*0.25*my_stepLength))*0.5;
   
   const double compared = fabs(exp(greensArg) * R_SD*R_SD * R_C*R_C);
-  if(compared!=compared)
-    cout << exp(greensArg)<<" " << R_SD<<" " <<R_C<<endl;
   if (compared < my_uniform(my_generator) or compared!=compared){
     my_particles.row(my_elected) -= RandMove;
     update_r_ij(my_elected);
