@@ -14,9 +14,9 @@ obr12 = 1+beta*r12
 Exp1 = exp(-alpha*(r1+r2)/2)
 Exp2 = exp(a*r12/(1+r12*beta))
 
-s.pretty_print(s.diff(Exp1,x1))
-print("\n\n\n")
-s.pretty_print(s.diff(Exp2,x1))
+#s.pretty_print(s.diff(Exp1,x1))
+#print("\n\n\n")
+s.pretty_print(s.diff(Exp2,x1).simplify())
 #s.pretty_print(1/r12)
 #print("\n")
 #s.pretty_print(sep/obr12**2*s.diff(1/r12,x1))

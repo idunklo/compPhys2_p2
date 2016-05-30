@@ -32,7 +32,7 @@ int main (int argc,char* argv[]){
   const double  beta		        = 0.45;//0.50905;
   const double  equilibration	  = 0.1;
   const double  derivativeStep  = 0.001;
-  const double  stepLength      = 0.005;
+  const double  stepLength      = 2.0;//0.005;
 
   std::vector<double> parameters {omega, beta, alpha};
   int nParticles = 20;

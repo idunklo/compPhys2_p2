@@ -27,7 +27,7 @@ void RandomUniform::setupInitialState ()
   //std::vector<double> position(my_nDimensions);
   for (int i = 0 ; i < my_nParticles ; i++){
     for(int j = 0 ; j < my_nDimensions ; j++){
-      particles(i,j) = uniform(generator);
+      particles(i,j) = uniform(generator)-0.5;
       //position[j] = (uniform(generator) - 0.5);
     }
     //my_system->add_particle(new Particle());

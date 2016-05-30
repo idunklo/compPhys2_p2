@@ -13,8 +13,8 @@ void System::runMetropolis ()
   my_generator.seed(seed);
 
   for (int cycle = 0 ; cycle < my_nCycles ; cycle++){
-    //accepted = metropolis();
-    accepted = importanceSampling();
+    accepted = metropolis();
+    //accepted = importanceSampling();
     if (cycle > my_equilibrationFraction * my_nCycles)
       my_sampler->sample(accepted);
   }
@@ -104,12 +104,12 @@ bool System::metropolis ()
     //  my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
     //}
     //cout << my_DMatrix_up_inv << endl;
-    my_DMatrix_up_inv = my_DMatrix_up.inverse();
-    my_DMatrix_dn_inv = my_DMatrix_dn.inverse();
     if(my_spin)
       my_DMatrix_up.row(my_elected) = SD_row_i;
     else
       my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
+    my_DMatrix_up_inv = my_DMatrix_up.inverse();
+    my_DMatrix_dn_inv = my_DMatrix_dn.inverse();
     return true;
   }
 }
@@ -198,20 +198,19 @@ bool System::importanceSampling()
               (my_normal(my_generator) + 0.5*my_stepLength*QforceOld(1));
 
   R_C = my_waveFunction->computeJastrow();
-
   my_particles.row(my_elected) += RandMove;
   update_r_ij(my_elected); 
   R_C = my_waveFunction->computeJastrow()/R_C;
-  if (fabs(QforceOld(0))>100000){
-    //cout << QforceOld.transpose() << endl;
-    //cout << RandMove.transpose() << endl<<endl;
-    //cout << my_DMatrix_up.determinant() << "  "
-    //     << my_DMatrix_dn.determinant() << endl<<endl;
-    //cout << my_elected << endl<<endl;
-    //cout << SD_row_i.transpose() << endl<<endl;
-    //cout << my_particles << endl << endl;
-    //cout << d_inv.transpose() << endl<<endl;
-  }
+  //if (fabs(QforceOld(0))>100000){
+  //  //cout << QforceOld.transpose() << endl;
+  //  //cout << RandMove.transpose() << endl<<endl;
+  //  //cout << my_DMatrix_up_inv.determinant() << "  "
+  //  //     << my_DMatrix_dn_inv.determinant() << endl<<endl;
+  //  //cout << my_elected << endl<<endl;
+  //  //cout << SD_row_i.transpose() << endl<<endl;
+  //  //cout << my_particles << endl << endl;
+  //  //cout << d_inv.transpose() << endl<<endl;
+  //}
 
 
   for (int n=0;n<=my_orbitals;n++){
@@ -253,13 +252,13 @@ bool System::importanceSampling()
     //                 SD_row_i, my_elected-detSize, R_SD);
     //  my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
     //}
-    
-    my_DMatrix_up_inv = my_DMatrix_up.inverse();
-    my_DMatrix_dn_inv = my_DMatrix_dn.inverse();
     if(my_spin)
       my_DMatrix_up.row(my_elected) = SD_row_i;
     else
       my_DMatrix_dn.row(my_elected-detSize) = SD_row_i;
+   
+    my_DMatrix_up_inv = my_DMatrix_up.inverse();
+    my_DMatrix_dn_inv = my_DMatrix_dn.inverse();
     //cout << my_DMatrix_up_inv.determinant() <<"  "<<my_DMatrix_dn_inv.determinant()<< endl;
     //cout << my_DMatrix_up.determinant() << "  "<<my_DMatrix_dn.determinant()<<endl << endl;
 
